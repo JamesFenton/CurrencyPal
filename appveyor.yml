@@ -1,4 +1,6 @@
 version: '{build}'
+environment:
+  nodejs_version: "6"
 image: Visual Studio 2017
 build_script:
 - ps: .\Build.ps1
