@@ -1,3 +1,9 @@
 <template>
-  <h1>${message}</h1>
+    <h1>Exchange Rates</h1>
+
+    <ul>
+        <li repeat.for="rate of rates.rates">
+            ${rate.ticker} - ${rate.rate}
+        </li>
+    </ul>
 </template>

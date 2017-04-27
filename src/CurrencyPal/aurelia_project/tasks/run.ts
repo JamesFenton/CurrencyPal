@@ -22,13 +22,7 @@ let serve = gulp.series(
       open: false,
       port: 9000,
       logLevel: 'silent',
-      server: {
-        baseDir: [project.platform.baseDir],
-        middleware: [historyApiFallback(), function(req, res, next) {
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          next();
-        }]
-      }
+      proxy: 'http://localhost:50248'
     }, function (err, bs) {
       if (err) return done(err);
       let urls = bs.options.get('urls').toJS();

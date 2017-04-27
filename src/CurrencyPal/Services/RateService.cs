@@ -12,7 +12,7 @@ namespace CurrencyPal.Services
     {
         private readonly HttpClient _Client = new HttpClient();
         private readonly string _CurrencyLayerAppId = Environment.GetEnvironmentVariable("CURRENCYLAYER_APPID");
-        private readonly string[] _Tickers = { "USDZAR", "GBPZAR", "BTCZAR", "ZARMUR" };
+        private readonly string[] _Tickers = { "USDZAR", "GBPZAR", "ZARMUR", "BTCZAR", "BTCUSD" };
 
         public async Task<RatesDto> GetExchangeRates()
         {

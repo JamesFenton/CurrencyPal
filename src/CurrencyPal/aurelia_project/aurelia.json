@@ -134,9 +134,16 @@
             "path": "../node_modules/aurelia-testing/dist/amd",
             "main": "aurelia-testing",
             "env": "dev"
+          },
+          {
+            "name": "aurelia-http-client",
+            "main": "aurelia-http-client",
+            "path": "../node_modules/aurelia-http-client/dist/amd",
+            "resources": []
           }
         ]
       }
     ]
-  }
+  },
+  "packageManager": "yarn"
 }
