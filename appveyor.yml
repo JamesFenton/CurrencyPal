@@ -1,0 +1,6 @@
+version: '{build}'
+image: Visual Studio 2017
+build_script:
+- ps: .\Build.ps1
+artifacts:
+- path: '*.zip'

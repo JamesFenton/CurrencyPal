@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyPal", "src\Currency
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B3F3DA78-1B19-4F58-BD86-D1455829EDA9}"
 	ProjectSection(SolutionItems) = preProject
+		Build.ps1 = Build.ps1
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
