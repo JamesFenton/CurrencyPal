@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyPal.Services
 {
-    public class RateService
+    public class RateService : IRateService
     {
         private readonly HttpClient _Client = new HttpClient();
         private readonly string _CurrencyLayerAppId = Environment.GetEnvironmentVariable("CURRENCYLAYER_APPID");
@@ -17,9 +17,7 @@ namespace CurrencyPal.Services
         public async Task<RatesDto> GetExchangeRates()
         {
             var bitcoin = await GetBitcoin();
-
-            var ratesResponse = await _Client.GetStringAsync($"https://openexchangerates.org/api/latest.json?app_id={_CurrencyLayerAppId}");
-            var sourceRates = JObject.Parse(ratesResponse)["rates"].ToObject<Dictionary<string, double>>();
+            var sourceRates = await GetRates();
             
             var dto = new RatesDto();
             foreach (var ticker in _Tickers)
@@ -41,6 +39,13 @@ namespace CurrencyPal.Services
             var response = await _Client.GetStringAsync($"https://api.mybitx.com/api/1/ticker?pair=XBTZAR");
             var rate = JObject.Parse(response)["last_trade"].ToObject<double>();
             return rate;
+        }
+
+        private async Task<Dictionary<string, double>> GetRates()
+        {
+            var ratesResponse = await _Client.GetStringAsync($"https://openexchangerates.org/api/latest.json?app_id={_CurrencyLayerAppId}");
+            var sourceRates = JObject.Parse(ratesResponse)["rates"].ToObject<Dictionary<string, double>>();
+            return sourceRates;
         }
 
         private static double GetRate(string ticker, Dictionary<string, double> rates)

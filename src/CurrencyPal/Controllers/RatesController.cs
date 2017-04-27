@@ -11,9 +11,9 @@ namespace CurrencyPal.Controllers
     [Route("api/[controller]")]
     public class RatesController : Controller
     {
-        private readonly RateService _RateService;
+        private readonly IRateService _RateService;
 
-        public RatesController(RateService rateService)
+        public RatesController(IRateService rateService)
         {
             _RateService = rateService;
         }

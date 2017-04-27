@@ -29,8 +29,10 @@ namespace CurrencyPal
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<RateService>();
+            services.AddSingleton<IRateService, CachingRateService>();
 
             // Add framework services.
+            services.AddMemoryCache();
             services.AddMvc();
         }
 
