@@ -11,25 +11,47 @@ namespace CurrencyPal.Services
     public class RateService
     {
         private readonly HttpClient _Client = new HttpClient();
+        private readonly string _CurrencyLayerAppId = Environment.GetEnvironmentVariable("CURRENCYLAYER_APPID");
+        private readonly string[] _Tickers = { "USDZAR", "GBPZAR", "BTCZAR", "ZARMUR" };
 
-        public async Task<RateDto> GetExchangeRate(string ticker)
+        public async Task<RatesDto> GetExchangeRates()
         {
-            var tickerToLookup = ticker.ToUpperInvariant();
-            if (tickerToLookup == "XBTZAR")
+            var bitcoin = await GetBitcoin();
+
+            var ratesResponse = await _Client.GetStringAsync($"https://openexchangerates.org/api/latest.json?app_id={_CurrencyLayerAppId}");
+            var sourceRates = JObject.Parse(ratesResponse)["rates"].ToObject<Dictionary<string, double>>();
+            
+            var dto = new RatesDto();
+            foreach (var ticker in _Tickers)
             {
-                var response = await _Client.GetStringAsync($"https://api.mybitx.com/api/1/ticker?pair={tickerToLookup}");
-                var rate = JObject.Parse(response).Value<double>("last_trade");
-                return new RateDto
+                double rate = ticker == "BTCZAR" ? bitcoin : GetRate(ticker, sourceRates);
+                
+                dto.Rates.Add(new RateDto
                 {
-                    Ticker = tickerToLookup,
                     Rate = rate,
-                    Source = "Luno"
-                };
+                    Ticker = ticker
+                });
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
+
+            return dto;
+        }
+
+        private async Task<double> GetBitcoin()
+        {
+            var response = await _Client.GetStringAsync($"https://api.mybitx.com/api/1/ticker?pair=XBTZAR");
+            var rate = JObject.Parse(response)["last_trade"].ToObject<double>();
+            return rate;
+        }
+
+        private static double GetRate(string ticker, Dictionary<string, double> rates)
+        {
+            var source = ticker.Substring(0, 3);
+            var dest = ticker.Substring(3, 3);
+
+            var sourceRate = rates[source];
+            var destRate = rates[dest];
+            var crossRate = destRate / sourceRate;
+            return crossRate;
         }
     }
 }

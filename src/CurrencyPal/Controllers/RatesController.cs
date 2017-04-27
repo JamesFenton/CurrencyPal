@@ -11,17 +11,17 @@ namespace CurrencyPal.Controllers
     [Route("api/[controller]")]
     public class RatesController : Controller
     {
-        private readonly RateService _ExchangeRateService;
+        private readonly RateService _RateService;
 
-        public RatesController(RateService exchangeRateService)
+        public RatesController(RateService rateService)
         {
-            _ExchangeRateService = exchangeRateService;
+            _RateService = rateService;
         }
 
-        [HttpGet("{ticker}")]
-        public async Task<RateDto> Get(string ticker)
+        [HttpGet]
+        public async Task<RatesDto> Get()
         {
-            return await _ExchangeRateService.GetExchangeRate(ticker);
+            return await _RateService.GetExchangeRates();
         }
     }
 }

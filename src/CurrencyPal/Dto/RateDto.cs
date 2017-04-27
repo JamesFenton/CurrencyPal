@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace CurrencyPal.Dto
 {
+    public class RatesDto
+    {
+        public List<RateDto> Rates { get; set; } = new List<RateDto>();
+    }
+
     public class RateDto
     {
         public string Ticker { get; set; }
