@@ -1,9 +1,18 @@
-var rp = require('request-promise-native');
+const fetch = require("node-fetch");
 
 const tickers = ["USDZAR", "GBPZAR", "ZARMUR", "BTCZAR", "BTCUSD"];
 
+var cacheExpiryTime = Date.now();
+var cachedRates;
+
 var getRates = function() {
 
+    // if the cached rates are still valid
+    if (Date.now() < cacheExpiryTime) {
+        return Promise.resolve(cachedRates)
+    }
+
+    // get rates
     var bitcoinPromise = getBitcoin();
     var otherRatesPromise = getOtherRates();
 
@@ -12,16 +21,17 @@ var getRates = function() {
             var bitcoin = results[0];
             var otherRates = results[1];
             var rates = tickers.map(ticker => ticker === "BTCZAR" ? bitcoin : otherRates.find(r => r.ticker === ticker));
+            
+            cachedRates = rates;
+            cacheExpiryTime = Date.now() + 1000 * 60 * 60 // 1 hour from now
+
             return rates;
         })
 }
 
 var getBitcoin = function() {
-    var options = {
-        uri: 'https://api.mybitx.com/api/1/ticker?pair=XBTZAR',
-        json: true // Automatically parses the JSON string in the response 
-    };
-    return rp(options)
+    return fetch('https://api.mybitx.com/api/1/ticker?pair=XBTZAR')
+        .then(res => res.json())
         .then(res => {
             var r = {ticker: "BTCZAR", rate: parseFloat(res.last_trade)};
             return r;
@@ -30,11 +40,8 @@ var getBitcoin = function() {
 
 var getOtherRates = function() {
     var appId = process.env.CURRENCYLAYER_APPID;
-    var options = {
-        uri: "https://openexchangerates.org/api/latest.json?app_id=" + appId,
-        json: true // Automatically parses the JSON string in the response 
-    };
-    return rp(options)
+    return fetch("https://openexchangerates.org/api/latest.json?app_id=" + appId)
+        .then(res => res.json())
         .then(res => {
             var source = res.rates;
             var rates = tickers.map(x => convertRate(x, source));
