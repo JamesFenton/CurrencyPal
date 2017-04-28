@@ -28,7 +28,7 @@ namespace CurrencyPal.Services
                 rates = await _RateService.GetExchangeRates();
 
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
+                    .SetSlidingExpiration(TimeSpan.FromHours(1)); // once per hour = 720 requests per month
 
                 _MemoryCache.Set(RatesKey, rates, cacheOptions);
             }
