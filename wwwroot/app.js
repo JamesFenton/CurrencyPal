@@ -14,7 +14,7 @@ var app = new Vue({
         round: function (value) {
             if (!value) 
                 return '';
-            var rounded = Math.round(value * 100) / 100;
+            var rounded = value.toFixed(2);
             return rounded;
         }
     },
