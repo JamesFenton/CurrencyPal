@@ -22,10 +22,14 @@ var getRates = function() {
             var otherRates = results[1];
             var rates = tickers.map(ticker => ticker === "BTCZAR" ? bitcoin : otherRates.find(r => r.ticker === ticker));
             
-            cachedRates = rates;
-            cacheExpiryTime = Date.now() + 1000 * 60 * 60 // 1 hour from now
+            updateTime = Date.now();
+            cacheExpiryTime = updateTime + 1000 * 60 * 60 // 1 hour from now
+            cachedRates = {
+                rates: rates,
+                updateTime: updateTime
+            };
 
-            return rates;
+            return cachedRates;
         })
 }
 
@@ -39,7 +43,7 @@ var getBitcoin = function() {
 }
 
 var getOtherRates = function() {
-    var appId = process.env.CURRENCYLAYER_APPID;
+    var appId = process.env.OPENEXCHANGERATES_APPID;
     return fetch("https://openexchangerates.org/api/latest.json?app_id=" + appId)
         .then(res => res.json())
         .then(res => {

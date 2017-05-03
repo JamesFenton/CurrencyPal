@@ -9,7 +9,7 @@ app.use(express.static('wwwroot'))
 
 app.get('/api/rates', function (req, res) {
   getRates()
-    .then(rates => res.send(rates))
+    .then(dto => res.send(dto))
 })
 
 app.listen(port, function () {
