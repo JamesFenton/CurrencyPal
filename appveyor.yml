@@ -1,8 +1,16 @@
-version: '0.1.{build}'
-environment:
-  nodejs_version: "6"
+version: 0.1.{build}
 image: Visual Studio 2017
 build_script:
 - ps: .\Build.ps1
 artifacts:
 - path: '*.zip'
+deploy:
+- provider: FTP
+  host: rates.fenton.xyz
+  protocol: sftp
+  username: james
+  password:
+    secure: juCQRLkza6ITEzpnWqjJWA==
+  folder: rates
+  on:
+    branch: master
