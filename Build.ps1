@@ -1,10 +1,5 @@
 dotnet restore
 
-Push-Location "$PSScriptRoot\src\CurrencyPal"
-yarn
-npm run build
-Pop-Location
+dotnet publish -o "$PSScriptRoot\publish\web"
 
-dotnet publish "$PSScriptRoot\src\CurrencyPal" -o "$PSScriptRoot\publish"
-
-7z a Rates.zip .\publish\**
+7z a Rates.Web.zip .\publish\\web**
