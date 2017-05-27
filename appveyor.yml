@@ -1,4 +1,4 @@
-version: '{build}'
+version: '0.1.{build}'
 environment:
   nodejs_version: "6"
 image: Visual Studio 2017
