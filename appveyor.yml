@@ -11,6 +11,6 @@ deploy:
   username: james
   password:
     secure: juCQRLkza6ITEzpnWqjJWA==
-  folder: rates
+  folder: packages
   on:
     branch: master
