@@ -4,8 +4,12 @@
     <meta charset="utf-8">
     <title>Exchange Rates</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" 
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" 
+          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" 
+          crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
     <script src="https://unpkg.com/vue"></script>
   </head>
 
@@ -13,10 +17,10 @@
 
     <div class="container" id="app">
         <div class="row">
-            <div class="col s12 m6 offset-m3">
-                <h3 class="center-align">Exchange Rates</h3>
+            <div class="col-sm-12 col-md-6 offset-md-3">
 
-                <table class="bordered striped">
+                <h1 class="text-center">Exchange Rates</h1>
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Ticker</th>
@@ -35,12 +39,12 @@
 
                 <p>{{updateTimeMessage}}</p>
 
-                <a class="waves-effect waves-light btn" 
+                <button class="btn btn-primary" 
                    v-on:click="getRates"
-                   v-bind:class="{ disabled: requesting }"
+                   v-bind:disabled="requesting"
                    v-show="updateAvailable">
                     Update
-                </a>
+                </button>
                 <p v-show="!updateAvailable">{{nextUpdateTimeMessage}}</p>
 
             </div>
