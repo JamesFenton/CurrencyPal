@@ -26,15 +26,18 @@ namespace Rates.Web.Services
             var getExchangeRates = GetExchangeRates();
             var getBitcoinZar = GetBitcoinZar();
             var getCryptoCurrencies = GetCryptoCurrencies();
+            var getShapeshift = GetShapeshift();
 
             var exchangeRates = await getExchangeRates;
             var bitcoinZar = await getBitcoinZar;
             var cryptoCurrencies = await getCryptoCurrencies;
+            var shapeshift = await getShapeshift;
 
             var rates = new List<RateDto>();
             rates.AddRange(exchangeRates);
             rates.Add(bitcoinZar);
             rates.AddRange(cryptoCurrencies);
+            rates.Add(shapeshift);
 
             return new RatesDto
             {
@@ -114,6 +117,17 @@ namespace Rates.Web.Services
                     Change24h = change24h
                 };
             }
+        }
+
+        private async Task<RateDto> GetShapeshift()
+        {
+            var response = await _http.GetStringAsync("http://shapeshift.io/rate/btc_eth");
+            var rate = JObject.Parse(response)["rate"].ToObject<double>();
+            return new RateDto
+            {
+                Ticker = "BTCETH",
+                Rate = rate
+            };
         }
     }
 }
