@@ -11,6 +11,7 @@
           crossorigin="anonymous">
 
     <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
 
   <body>
@@ -20,7 +21,12 @@
             <div class="col-sm-12 col-md-6 offset-md-3">
 
                 <h1 class="text-center">Exchange Rates</h1>
-                <table class="table table-striped">
+
+                <div class="alert alert-danger" role="alert" v-show="errorMessage">
+                    {{errorMessage}}
+                </div>
+
+                <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Ticker</th>
@@ -37,15 +43,13 @@
                     </tbody>
                 </table>
 
-                <p>{{updateTimeMessage}}</p>
+                <p>{{updateTimeMessage}} <br /> {{nextUpdateTimeMessage}}</p>
 
                 <button class="btn btn-primary" 
                    v-on:click="getRates"
-                   v-bind:disabled="requesting"
-                   v-show="updateAvailable">
-                    Update
+                   v-bind:disabled="requesting">
+                    {{requesting ? 'Updating...' : 'Update'}}
                 </button>
-                <p v-show="!updateAvailable">{{nextUpdateTimeMessage}}</p>
 
             </div>
         </div>

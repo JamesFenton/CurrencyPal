@@ -5,26 +5,27 @@ var app = new Vue({
         updateTimeMessage: null,
         nextUpdateTime: 0,
         nextUpdateTimeMessage: null,
-        updateAvailable: false,
-        requesting: false
+        requesting: false,
+        errorMessage: null
     },
     methods: {
         getRates: function () {
             this.requesting = true;
-            fetch("api/rates")
-                .then(res => res.json())
-                .then(dto => {
+            this.errorMessage = null;
+            axios.get("api/rates")
+                .then(response => {
+                    var dto = response.data;
                     this.requesting = false;
                     this.rates = dto.rates;
                     this.updateTimeMessage = "Last updated at " + new Date(dto.updateTime).toLocaleTimeString();
                     this.nextUpdateTime = dto.nextUpdateTime;
                     this.nextUpdateTimeMessage = "Next update at " + new Date(dto.nextUpdateTime).toLocaleTimeString();
-                    this.isUpdateAvailable();
                 })
-                .catch(() => this.requesting = false);
-        },
-        isUpdateAvailable: function () {
-            this.updateAvailable = Date.now() > this.nextUpdateTime;
+                .catch(error => {
+                    var response = error.response.data;
+                    this.requesting = false
+                    this.errorMessage = response.message;
+                });
         }
     },
     filters: {
@@ -37,7 +38,5 @@ var app = new Vue({
     },
     created: function() {
         this.getRates();
-        this.isUpdateAvailable();
-        setInterval(() => this.isUpdateAvailable(), 5000);
     }
 })
