@@ -45,6 +45,8 @@ namespace Rates.Web
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseMvc();
         }
     }
