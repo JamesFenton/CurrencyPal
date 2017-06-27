@@ -23,21 +23,17 @@ namespace Rates.Web.Services
 
         public async Task<RatesDto> GetRates()
         {
-            var getExchangeRates = GetExchangeRates();
-            var getBitcoinZar = GetBitcoinZar();
-            var getCryptoCurrencies = GetCryptoCurrencies();
-            var getShapeshift = GetShapeshift();
+            var tasks = new List<Task<List<RateDto>>>
+            {
+                GetExchangeRates(),
+                GetBitcoinZar(),
+                GetCryptoCurrencies(),
+                GetShapeshift()
+            };
 
-            var exchangeRates = await getExchangeRates;
-            var bitcoinZar = await getBitcoinZar;
-            var cryptoCurrencies = await getCryptoCurrencies;
-            var shapeshift = await getShapeshift;
+            await Task.WhenAll(tasks);
 
-            var rates = new List<RateDto>();
-            rates.AddRange(exchangeRates);
-            rates.Add(bitcoinZar);
-            rates.AddRange(cryptoCurrencies);
-            rates.Add(shapeshift);
+            var rates = tasks.SelectMany(t => t.Result).ToList();
 
             return new RatesDto
             {
@@ -66,31 +62,34 @@ namespace Rates.Web.Services
             }
         }
         
-        private async Task<RateDto> GetBitcoinZar()
+        private async Task<List<RateDto>> GetBitcoinZar()
         {
             var response = await _http.GetStringAsync("https://api.mybitx.com/api/1/ticker?pair=XBTZAR");
             var responseObject = JObject.Parse(response) as JObject;
             var rate = responseObject["last_trade"].Value<double>();
-            return new RateDto
+
+            return new List<RateDto>
             {
-                Ticker = "BTCZAR",
-                Rate = rate
+                new RateDto
+                {
+                    Ticker = "BTCZAR",
+                    Rate = rate
+                }
             };
         }
 
         private async Task<List<RateDto>> GetCryptoCurrencies()
         {
-            var getBitcoin = GetRate("BTCUSD");
-            var getEthereum = GetRate("ETHUSD");
-
-            var bitcoin = await getBitcoin;
-            var ethereum = await getEthereum;
-
-            return new List<RateDto>
+            var tasks = new List<Task<RateDto>>
             {
-                bitcoin,
-                ethereum
+                GetRate("BTCUSD"),
+                GetRate("ETHUSD"),
+                GetRate("ZECUSD")
             };
+
+            await Task.WhenAll(tasks);
+
+            return tasks.Select(t => t.Result).ToList();
 
             async Task<RateDto> GetRate(string ticker)
             {
@@ -102,6 +101,9 @@ namespace Rates.Web.Services
                         break;
                     case "ETHUSD":
                         coinmarketcapTicker = "ethereum";
+                        break;
+                    case "ZECUSD":
+                        coinmarketcapTicker = "zcash";
                         break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
@@ -119,15 +121,40 @@ namespace Rates.Web.Services
             }
         }
 
-        private async Task<RateDto> GetShapeshift()
+        private async Task<List<RateDto>> GetShapeshift()
         {
-            var response = await _http.GetStringAsync("http://shapeshift.io/rate/btc_eth");
-            var rate = JObject.Parse(response)["rate"].ToObject<double>();
-            return new RateDto
+            var tasks = new List<Task<RateDto>>
             {
-                Ticker = "BTCETH",
-                Rate = rate
+                GetRate("BTCETH"),
+                GetRate("BTCZEC")
             };
+
+            await Task.WhenAll(tasks);
+
+            return tasks.Select(t => t.Result).ToList();
+
+            async Task<RateDto> GetRate(string ticker)
+            {
+                string shapeshiftTicker;
+                switch (ticker)
+                {
+                    case "BTCETH":
+                        shapeshiftTicker = "btc_eth";
+                        break;
+                    case "BTCZEC":
+                        shapeshiftTicker = "btc_zec";
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid ticker: " + ticker);
+                }
+                var response = await _http.GetStringAsync($"http://shapeshift.io/rate/{shapeshiftTicker}");
+                var rate = JObject.Parse(response)["rate"].ToObject<double>();
+                return new RateDto
+                {
+                    Ticker = ticker,
+                    Rate = rate
+                };
+            }
         }
     }
 }
