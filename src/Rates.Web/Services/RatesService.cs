@@ -84,7 +84,7 @@ namespace Rates.Web.Services
             {
                 GetRate("BTCUSD"),
                 GetRate("ETHUSD"),
-                GetRate("ZECUSD")
+                GetRate("EOSUSD")
             };
 
             await Task.WhenAll(tasks);
@@ -102,8 +102,8 @@ namespace Rates.Web.Services
                     case "ETHUSD":
                         coinmarketcapTicker = "ethereum";
                         break;
-                    case "ZECUSD":
-                        coinmarketcapTicker = "zcash";
+                    case "EOSUSD":
+                        coinmarketcapTicker = "eos";
                         break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
@@ -112,11 +112,13 @@ namespace Rates.Web.Services
                 var rateReponse = JArray.Parse(response).First();
                 var rate = rateReponse["price_usd"].Value<double>();
                 var change24h = rateReponse["percent_change_24h"].Value<double>();
+                var change7d = rateReponse["percent_change_7d"].Value<double>();
                 return new RateDto
                 {
                     Ticker = ticker,
                     Rate = rate,
-                    Change24h = change24h
+                    Change24h = change24h,
+                    Change7d = change7d
                 };
             }
         }
@@ -125,8 +127,8 @@ namespace Rates.Web.Services
         {
             var tasks = new List<Task<RateDto>>
             {
-                GetRate("BTCETH"),
-                GetRate("BTCZEC")
+                //GetRate("BTCETH"),
+                //GetRate("BTCZEC")
             };
 
             await Task.WhenAll(tasks);
