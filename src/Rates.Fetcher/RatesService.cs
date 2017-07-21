@@ -1,13 +1,18 @@
 ﻿using Newtonsoft.Json.Linq;
-using Rates.Web.Dto;
+using Rates.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Rates.Web.Services
+namespace Rates.Fetcher
 {
+    public interface IRatesService
+    {
+        Task<IEnumerable<Rate>> GetRates();
+    }
+
     public class RatesService : IRatesService
     {
         private readonly string[] _fiatTickers = { "USDZAR", "GBPZAR", "EURZAR", "ZARMUR" };
@@ -21,9 +26,9 @@ namespace Rates.Web.Services
             _http = http;
         }
 
-        public async Task<RatesDto> GetRates()
+        public async Task<IEnumerable<Rate>> GetRates()
         {
-            var tasks = new List<Task<List<RateDto>>>
+            var tasks = new List<Task<List<Rate>>>
             {
                 GetExchangeRates(),
                 GetBitcoinZar(),
@@ -35,14 +40,10 @@ namespace Rates.Web.Services
 
             var rates = tasks.SelectMany(t => t.Result).ToList();
 
-            return new RatesDto
-            {
-                Rates = rates,
-                UpdateTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            };
+            return rates;
         }
 
-        private async Task<List<RateDto>> GetExchangeRates()
+        private async Task<List<Rate>> GetExchangeRates()
         {
             var response = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json?app_id=" + _openExchangeRatesKey);
             var sourceRates = JObject.Parse(response)["rates"] as JObject;
@@ -50,7 +51,7 @@ namespace Rates.Web.Services
             var rates = _fiatTickers.Select(t => ConvertRate(t)).ToList();
             return rates;
 
-            RateDto ConvertRate(string ticker)
+            Rate ConvertRate(string ticker)
             {
                 var source = ticker.Substring(0, 3);
                 var dest = ticker.Substring(3, 3);
@@ -58,29 +59,25 @@ namespace Rates.Web.Services
                 var sourceRate = sourceRates[source].Value<double>();
                 var destRate = sourceRates[dest].Value<double>();
                 var crossRate = destRate / sourceRate;
-                return new RateDto { Ticker = ticker, Rate = crossRate };
+                return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, crossRate);
             }
         }
         
-        private async Task<List<RateDto>> GetBitcoinZar()
+        private async Task<List<Rate>> GetBitcoinZar()
         {
             var response = await _http.GetStringAsync("https://api.mybitx.com/api/1/ticker?pair=XBTZAR");
             var responseObject = JObject.Parse(response) as JObject;
             var rate = responseObject["last_trade"].Value<double>();
 
-            return new List<RateDto>
+            return new List<Rate>
             {
-                new RateDto
-                {
-                    Ticker = "BTCZAR",
-                    Rate = rate
-                }
+                new Rate(Guid.NewGuid(), "BTCZAR", DateTime.UtcNow, rate)
             };
         }
 
-        private async Task<List<RateDto>> GetCryptoCurrencies()
+        private async Task<List<Rate>> GetCryptoCurrencies()
         {
-            var tasks = new List<Task<RateDto>>
+            var tasks = new List<Task<Rate>>
             {
                 GetRate("BTCUSD"),
                 GetRate("ETHUSD"),
@@ -91,7 +88,7 @@ namespace Rates.Web.Services
 
             return tasks.Select(t => t.Result).ToList();
 
-            async Task<RateDto> GetRate(string ticker)
+            async Task<Rate> GetRate(string ticker)
             {
                 string coinmarketcapTicker;
                 switch (ticker)
@@ -112,18 +109,13 @@ namespace Rates.Web.Services
                 var rateReponse = JArray.Parse(response).First();
                 var rate = rateReponse["price_usd"].Value<double>();
                 var change24h = rateReponse["percent_change_24h"].Value<double>();
-                return new RateDto
-                {
-                    Ticker = ticker,
-                    Rate = rate,
-                    Change24h = change24h
-                };
+                return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, rate);
             }
         }
 
-        private async Task<List<RateDto>> GetShapeshift()
+        private async Task<List<Rate>> GetShapeshift()
         {
-            var tasks = new List<Task<RateDto>>
+            var tasks = new List<Task<Rate>>
             {
                 GetRate("BTCETH"),
                 GetRate("BTCZEC")
@@ -133,7 +125,7 @@ namespace Rates.Web.Services
 
             return tasks.Select(t => t.Result).ToList();
 
-            async Task<RateDto> GetRate(string ticker)
+            async Task<Rate> GetRate(string ticker)
             {
                 string shapeshiftTicker;
                 switch (ticker)
@@ -149,11 +141,7 @@ namespace Rates.Web.Services
                 }
                 var response = await _http.GetStringAsync($"http://shapeshift.io/rate/{shapeshiftTicker}");
                 var rate = JObject.Parse(response)["rate"].ToObject<double>();
-                return new RateDto
-                {
-                    Ticker = ticker,
-                    Rate = rate
-                };
+                return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, rate);
             }
         }
     }

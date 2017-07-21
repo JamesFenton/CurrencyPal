@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Core", "src\Rates.Core\Rates.Core.csproj", "{39B230E8-40CB-4EF0-B040-B934DB528BEB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Fetcher", "src\Rates.Fetcher\Rates.Fetcher.csproj", "{F4DDA143-86B2-41F5-A553-C9880D066F23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,11 +28,21 @@ Global
 		{F406FD27-80AC-4832-9ADB-EB6F027D6C8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F406FD27-80AC-4832-9ADB-EB6F027D6C8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F406FD27-80AC-4832-9ADB-EB6F027D6C8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B230E8-40CB-4EF0-B040-B934DB528BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B230E8-40CB-4EF0-B040-B934DB528BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B230E8-40CB-4EF0-B040-B934DB528BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B230E8-40CB-4EF0-B040-B934DB528BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4DDA143-86B2-41F5-A553-C9880D066F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4DDA143-86B2-41F5-A553-C9880D066F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4DDA143-86B2-41F5-A553-C9880D066F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4DDA143-86B2-41F5-A553-C9880D066F23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F406FD27-80AC-4832-9ADB-EB6F027D6C8C} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
+		{39B230E8-40CB-4EF0-B040-B934DB528BEB} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
+		{F4DDA143-86B2-41F5-A553-C9880D066F23} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
 	EndGlobalSection
 EndGlobal
