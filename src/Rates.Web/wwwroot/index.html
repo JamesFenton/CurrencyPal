@@ -31,16 +31,16 @@
                         <tr>
                             <th>Ticker</th>
                             <th>Rate</th>
-                            <th>24h</th>
-                            <th>7d</th>
+                            <th>1d</th>
+                            <th>1w</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="rate in rates">
                             <td>{{rate.ticker}}</td>
                             <td>{{rate.rate | round}}</td>
-                            <td>{{rate.change24h ? rate.change24h + '%' : ''}}</td>
-                            <td>{{rate.change7d ? rate.change7d + '%' : ''}}</td>
+                            <td>{{rate.change1Day ? rate.change1Day + '%' : ''}}</td>
+                            <td>{{rate.change1Week ? rate.change1Week + '%' : ''}}</td>
                         </tr>
                     </tbody>
                 </table>
