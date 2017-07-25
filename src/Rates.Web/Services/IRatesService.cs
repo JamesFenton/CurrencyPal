@@ -8,6 +8,6 @@ namespace Rates.Web.Services
 {
     public interface IRatesService
     {
-        Task<RatesDto> GetRates();
+        RatesDto GetRates();
     }
 }

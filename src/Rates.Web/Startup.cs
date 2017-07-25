@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rates.Web.Services;
 using System.Net.Http;
+using Rates.Core;
+using MongoDB.Driver;
 
 namespace Rates.Web
 {
@@ -29,8 +31,9 @@ namespace Rates.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var openExchangeRatesKey = Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID");
-            services.AddSingleton(c => new RatesService(openExchangeRatesKey, new HttpClient()));
+            var database = new Database(new MongoClient(Constants.ConnectionString), Constants.Database);
+            services.AddSingleton(database);
+            services.AddSingleton<DatabaseRatesService>();
             services.AddSingleton<IRatesService, CachingRatesService>();
 
             // Add framework services.

@@ -1,10 +1,12 @@
-version: 0.1.{build}
+version: 0.2.{build}
 image: Visual Studio 2017
 build_script:
 - ps: .\Build.ps1
 artifacts:
 - path: Rates.Web.*.zip
   name: Rates.Web
+- path: Rates.Fetcher.*.zip
+  name: Rates.Fetcher
 deploy:
 - provider: Environment
   name: Rates
