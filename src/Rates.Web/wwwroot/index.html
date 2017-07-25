@@ -31,7 +31,8 @@
                         <tr>
                             <th>Ticker</th>
                             <th>Rate</th>
-                            <th>24h Change</th>
+                            <th>24h</th>
+                            <th>7d</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,6 +40,7 @@
                             <td>{{rate.ticker}}</td>
                             <td>{{rate.rate | round}}</td>
                             <td>{{rate.change24h ? rate.change24h + '%' : ''}}</td>
+                            <td>{{rate.change7d ? rate.change7d + '%' : ''}}</td>
                         </tr>
                     </tbody>
                 </table>
