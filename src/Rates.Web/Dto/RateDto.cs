@@ -9,6 +9,8 @@ namespace Rates.Web.Dto
     {
         public string Ticker { get; set; }
         public double Rate { get; set; }
-        public double? Change24h { get; set; }
+        public double? Change1Day { get; set; }
+        public double? Change1Week { get; set; }
+        public double? Change1Month { get; set; }
     }
 }

@@ -19,9 +19,9 @@ namespace Rates.Web.Controllers
         }
         
         [HttpGet]
-        public async Task<RatesDto> Get()
+        public RatesDto Get()
         {
-            return await _ratesService.GetRates();
+            return _ratesService.GetRates();
         }
     }
 }

@@ -12,22 +12,27 @@ namespace Rates.Web.Services
         private long _cacheExpiryTime;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromHours(1);
 
-        private readonly RatesService _ratesService;
+        private readonly DatabaseRatesService _ratesService;
 
-        public CachingRatesService(RatesService ratesService)
+        public CachingRatesService(DatabaseRatesService ratesService)
         {
             _ratesService = ratesService;
         }
 
-        public async Task<RatesDto> GetRates()
+        public RatesDto GetRates()
         {
             var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var cacheExpired = now > _cacheExpiryTime;
             if (_cachedRates == null || cacheExpired)
             {
-                _cachedRates = await _ratesService.GetRates();
+                var rates = _ratesService.GetRates();
                 _cacheExpiryTime = DateTimeOffset.UtcNow.Add(_cacheDuration).ToUnixTimeMilliseconds();
-                _cachedRates.NextUpdateTime = _cacheExpiryTime;
+                _cachedRates = new RatesDto
+                {
+                    Rates = rates,
+                    UpdateTime = now,
+                    NextUpdateTime = _cacheExpiryTime
+                };
             }
             return _cachedRates;
         }

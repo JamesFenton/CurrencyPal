@@ -14,10 +14,13 @@ namespace Rates.Fetcher
 {
     public class Service : ServiceBase
     {
+        private readonly bool _developerMode;
         private readonly IScheduler _scheduler;
 
-        public Service()
+        public Service(bool developerMode)
         {
+            _developerMode = developerMode;
+
             // Grab the Scheduler instance from the Factory 
             _scheduler = StdSchedulerFactory.GetDefaultScheduler();
 
@@ -41,14 +44,28 @@ namespace Rates.Fetcher
                 .WithIdentity("job1", "group1")
                 .Build();
 
-            // Trigger the job to run now, and then repeat every 10 seconds
-            ITrigger trigger = TriggerBuilder.Create()
+            // Trigger the job
+            ITrigger trigger;
+            if (_developerMode)
+            {
+                trigger = TriggerBuilder.Create()
+                .WithIdentity("trigger1", "group1")
+                .StartNow()
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInMinutes(1)
+                    .RepeatForever())
+                .Build();
+            }
+            else
+            {
+                trigger = TriggerBuilder.Create()
                 .WithIdentity("trigger1", "group1")
                 .StartAt(DateBuilder.EvenHourDateAfterNow())
                 .WithSimpleSchedule(x => x
                     .WithIntervalInHours(1)
                     .RepeatForever())
                 .Build();
+            }
 
             // Tell quartz to schedule the job using our trigger
             _scheduler.ScheduleJob(job, trigger);

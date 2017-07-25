@@ -15,8 +15,9 @@ namespace Rates.Core
         public Database(MongoClient client, string database)
         {
             _database = client.GetDatabase(database);
+
             Rates.Indexes.CreateOne(Builders<Rate>.IndexKeys.Combine(
-                Builders<Rate>.IndexKeys.Ascending(r => r.Identifier),
+                Builders<Rate>.IndexKeys.Ascending(r => r.Ticker),
                 Builders<Rate>.IndexKeys.Ascending(r => r.Timestamp)
             ));
         }

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Quartz;
 using Rates.Core;
-using System.Net.Http;
 
 namespace Rates.Fetcher
 {

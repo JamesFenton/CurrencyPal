@@ -7,9 +7,10 @@ namespace Rates.Fetcher
     {
         static void Main(string[] args)
         {
-            var service = new Service();
+            var developerMode = Environment.UserInteractive;
+            var service = new Service(developerMode);
 
-            if (Environment.UserInteractive)
+            if (developerMode)
             {
                 service.Start();
             }

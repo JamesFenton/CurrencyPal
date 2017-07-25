@@ -7,14 +7,14 @@ namespace Rates.Core.Models
     public class Rate
     {
         public Guid Id { get; }
-        public string Identifier { get; }
+        public string Ticker { get; }
         public DateTime Timestamp { get; }
         public double Value { get; }
         
-        public Rate(Guid id, string identifier, DateTime timestamp, double value)
+        public Rate(Guid id, string ticker, DateTime timestamp, double value)
         {
             Id = id;
-            Identifier = identifier;
+            Ticker = ticker;
             Timestamp = timestamp;
             Value = value;
         }

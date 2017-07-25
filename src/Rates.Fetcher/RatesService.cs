@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Rates.Core;
 using Rates.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,6 @@ namespace Rates.Fetcher
 
     public class RatesService : IRatesService
     {
-        private readonly string[] _fiatTickers = { "USDZAR", "GBPZAR", "EURZAR", "ZARMUR" };
-
         private readonly string _openExchangeRatesKey;
         private readonly HttpClient _http;
 
@@ -33,7 +32,6 @@ namespace Rates.Fetcher
                 GetExchangeRates(),
                 GetBitcoinZar(),
                 GetCryptoCurrencies(),
-                GetShapeshift()
             };
 
             await Task.WhenAll(tasks);
@@ -48,7 +46,7 @@ namespace Rates.Fetcher
             var response = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json?app_id=" + _openExchangeRatesKey);
             var sourceRates = JObject.Parse(response)["rates"] as JObject;
 
-            var rates = _fiatTickers.Select(t => ConvertRate(t)).ToList();
+            var rates = Constants.FiatTickers.Select(t => ConvertRate(t)).ToList();
             return rates;
 
             Rate ConvertRate(string ticker)
@@ -77,12 +75,7 @@ namespace Rates.Fetcher
 
         private async Task<List<Rate>> GetCryptoCurrencies()
         {
-            var tasks = new List<Task<Rate>>
-            {
-                GetRate("BTCUSD"),
-                GetRate("ETHUSD"),
-                GetRate("ZECUSD")
-            };
+            var tasks = Constants.CryptoTickers.Select(ticker => GetRate(ticker)).ToList();
 
             await Task.WhenAll(tasks);
 
@@ -102,13 +95,15 @@ namespace Rates.Fetcher
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
+                    case "EOSUSD":
+                        coinmarketcapTicker = "eos";
+                        break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
                 }
                 var response = await _http.GetStringAsync("https://api.coinmarketcap.com/v1/ticker/" + coinmarketcapTicker);
                 var rateReponse = JArray.Parse(response).First();
                 var rate = rateReponse["price_usd"].Value<double>();
-                var change24h = rateReponse["percent_change_24h"].Value<double>();
                 return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, rate);
             }
         }
