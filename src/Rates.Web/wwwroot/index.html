@@ -39,8 +39,8 @@
                         <tr v-for="rate in rates">
                             <td>{{rate.ticker}}</td>
                             <td>{{rate.rate | round}}</td>
-                            <td>{{rate.change1Day ? rate.change1Day + '%' : ''}}</td>
-                            <td>{{rate.change1Week ? rate.change1Week + '%' : ''}}</td>
+                            <td>{{rate.change1Day | roundedPercentage}}</td>
+                            <td>{{rate.change1Week | roundedPercentage}}</td>
                         </tr>
                     </tbody>
                 </table>

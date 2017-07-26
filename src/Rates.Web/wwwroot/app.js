@@ -36,6 +36,12 @@ var app = new Vue({
                 return '';
             var rounded = value.toFixed(2);
             return rounded;
+        },
+        roundedPercentage: function (value) {
+            if (!value)
+                return '';
+            var rounded = (value * 100).toFixed(2) + '%';
+            return rounded;
         }
     },
     created: function() {
