@@ -10,7 +10,7 @@ namespace Rates.Web.Services
     {
         private RatesDto _cachedRates;
         private long _cacheExpiryTime;
-        private readonly TimeSpan _cacheDuration = TimeSpan.FromHours(1);
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(5);
 
         private readonly DatabaseRatesService _ratesService;
 
@@ -30,7 +30,7 @@ namespace Rates.Web.Services
                 _cachedRates = new RatesDto
                 {
                     Rates = rates,
-                    UpdateTime = now,
+                    UpdateTime = rates.Min(r => r.Timestamp).ToUnixTimeMilliseconds(),
                     NextUpdateTime = _cacheExpiryTime
                 };
             }

@@ -28,6 +28,10 @@ namespace Rates.Web.Services
 
         private RateDto GetMostRecentRate(string ticker)
         {
+            // add 2 minutes so we don't get a rate from 23 hours ago
+            // since the rate might be saved a few seconds after the hour
+            var now = DateTime.UtcNow.AddMinutes(2);
+
             var rate = _database.Rates
                 .AsQueryable()
                 .Where(r => r.Ticker == ticker)
@@ -36,25 +40,26 @@ namespace Rates.Web.Services
 
             var rate1DayAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= DateTime.UtcNow.AddDays(-1))
+                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddDays(-1))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
 
             var rate1WeekAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= DateTime.UtcNow.AddDays(-7))
+                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddDays(-7))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
 
             var rate1MonthAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= DateTime.UtcNow.AddMonths(-1))
+                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddMonths(-1))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
 
             return new RateDto
             {
                 Ticker = rate.Ticker,
+                Timestamp = rate.Timestamp,
                 Rate = rate.Value,
                 Change1Day = GetChange(rate.Value, rate1DayAgo?.Value),
                 Change1Week = GetChange(rate.Value, rate1WeekAgo?.Value),
