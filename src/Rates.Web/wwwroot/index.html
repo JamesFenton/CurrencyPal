@@ -10,6 +10,8 @@
           integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" 
           crossorigin="anonymous">
 
+    <link rel="stylesheet" href="site.css" />
+
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
@@ -39,10 +41,10 @@
                         <tr v-for="rate in rates">
                             <td>{{rate.ticker}}</td>
                             <td>{{rate.rate | round}}</td>
-                            <td v-bind:class="[rate.change1Day > 0 ? 'table-success' : '', rate.change1Day < 0 ? 'table-danger' : '']">
+                            <td v-bind:class="[rate.change1Day > 0 ? 'positive-change' : '', rate.change1Day < 0 ? 'negative-change' : '']">
                                 {{rate.change1Day | roundedPercentage}}
                             </td>
-                            <td v-bind:class="[rate.change1Week > 0 ? 'table-success' : '', rate.change1Week < 0 ? 'table-danger' : '']">
+                            <td v-bind:class="[rate.change1Week > 0 ? 'positive-change' : '', rate.change1Week < 0 ? 'negative-change' : '']">
                                 {{rate.change1Week | roundedPercentage}}
                             </td>
                         </tr>
