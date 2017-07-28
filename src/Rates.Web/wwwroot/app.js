@@ -19,8 +19,6 @@ var app = new Vue({
 
                     this.rates = dto.rates;
                     this.updateTimeMessage = "Last updated at " + new Date(dto.updateTime).toLocaleTimeString();
-                    this.nextUpdateTime = dto.nextUpdateTime;
-                    this.nextUpdateTimeMessage = "Next update at " + new Date(dto.nextUpdateTime).toLocaleTimeString();
                 })
                 .catch(error => {
                     var response = error.response.data;

@@ -8,7 +8,7 @@ using MongoDB.Driver;
 
 namespace Rates.Web.Services
 {
-    public class DatabaseRatesService
+    public class DatabaseRatesService : IRatesService
     {
         private readonly Database _database;
 
@@ -17,13 +17,18 @@ namespace Rates.Web.Services
             _database = database;
         }
 
-        public List<RateDto> GetRates()
+        public RatesDto GetRates()
         {
             var rates = Constants.FiatTickers
                 .Concat(Constants.CryptoTickers)
                 .Select(ticker => GetMostRecentRate(ticker))
                 .ToList();
-            return rates;
+
+            return new RatesDto
+            {
+                Rates = rates,
+                UpdateTime = rates.Min(r => r.Timestamp).ToUnixTimeMilliseconds()
+            };
         }
 
         private RateDto GetMostRecentRate(string ticker)

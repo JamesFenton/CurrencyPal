@@ -39,13 +39,17 @@
                         <tr v-for="rate in rates">
                             <td>{{rate.ticker}}</td>
                             <td>{{rate.rate | round}}</td>
-                            <td>{{rate.change1Day | roundedPercentage}}</td>
-                            <td>{{rate.change1Week | roundedPercentage}}</td>
+                            <td v-bind:class="[rate.change1Day > 0 ? 'table-success' : '', rate.change1Day < 0 ? 'table-danger' : '']">
+                                {{rate.change1Day | roundedPercentage}}
+                            </td>
+                            <td v-bind:class="[rate.change1Week > 0 ? 'table-success' : '', rate.change1Week < 0 ? 'table-danger' : '']">
+                                {{rate.change1Week | roundedPercentage}}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <p>{{updateTimeMessage}} <br /> {{nextUpdateTimeMessage}}</p>
+                <p>{{updateTimeMessage}}</p>
 
                 <button class="btn btn-primary" 
                    v-on:click="getRates"

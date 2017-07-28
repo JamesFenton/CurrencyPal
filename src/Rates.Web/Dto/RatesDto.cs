@@ -7,8 +7,7 @@ namespace Rates.Web.Dto
 {
     public class RatesDto
     {
-        public List<RateDto> Rates { get; set; } = new List<RateDto>();
+        public List<RateDto> Rates { get; set; }
         public long UpdateTime { get; set; }
-        public long NextUpdateTime { get; set; }
     }
 }
