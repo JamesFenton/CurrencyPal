@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="before-deploy.ps1" CopyToPublishDirectory="Always" />
+    <Content Include="*.ps1" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
