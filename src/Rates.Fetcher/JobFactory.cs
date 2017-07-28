@@ -11,13 +11,15 @@ namespace Rates.Fetcher
 {
     public class JobFactory : IJobFactory
     {
-        private readonly RatesService _ratesService;
+        private readonly RatesFetcher _ratesService;
         private readonly Database _database;
+        private readonly Mediator _mediator;
 
-        public JobFactory(RatesService ratesService, Database database)
+        public JobFactory(RatesFetcher ratesService, Database database, Mediator mediator)
         {
             _ratesService = ratesService;
             _database = database;
+            _mediator = mediator;
         }
 
         public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
@@ -27,7 +29,7 @@ namespace Rates.Fetcher
 
             if (jobType == typeof(RateFetcherJob))
             {
-                var job = new RateFetcherJob(_database, _ratesService);
+                var job = new RateFetcherJob(_database, _ratesService, _mediator);
                 return job;
             }
             else

@@ -25,8 +25,11 @@ namespace Rates.Fetcher
             _scheduler = StdSchedulerFactory.GetDefaultScheduler();
 
             var database = new Database(new MongoClient(Constants.ConnectionString), Constants.Database);
-            var ratesService = new RatesService(Constants.OpenExchangeRatesAppId, new HttpClient());
-            _scheduler.JobFactory = new JobFactory(ratesService, database);
+            var ratesService = new RatesFetcher(Constants.OpenExchangeRatesAppId, new HttpClient());
+            var rateAddedHandler = new RateAddedHandler(database);
+            var mediator = new Mediator(rateAddedHandler);
+
+            _scheduler.JobFactory = new JobFactory(ratesService, database, mediator);
         }
 
         public void Start()

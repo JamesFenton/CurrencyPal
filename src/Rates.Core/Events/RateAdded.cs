@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Rates.Core.Models
+namespace Rates.Core.Events
 {
-    public class Rate
+    public class RateAdded : Event
     {
         public Guid Id { get; }
         public string Ticker { get; }
         public DateTime Timestamp { get; }
         public double Value { get; }
-        
-        public Rate(Guid id, string ticker, DateTime timestamp, double value)
+
+        public RateAdded(Guid id, string ticker, DateTime timestamp, double value)
         {
             Id = id;
             Ticker = ticker;

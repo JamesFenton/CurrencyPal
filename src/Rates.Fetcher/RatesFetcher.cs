@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Rates.Core;
-using Rates.Core.Models;
+using Rates.Core.WriteModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +9,18 @@ using System.Threading.Tasks;
 
 namespace Rates.Fetcher
 {
-    public interface IRatesService
-    {
-        Task<IEnumerable<Rate>> GetRates();
-    }
-
-    public class RatesService : IRatesService
+    public class RatesFetcher
     {
         private readonly string _openExchangeRatesKey;
         private readonly HttpClient _http;
 
-        public RatesService(string openExchangeRatesKey, HttpClient http)
+        public RatesFetcher(string openExchangeRatesKey, HttpClient http)
         {
             _openExchangeRatesKey = openExchangeRatesKey;
             _http = http;
         }
 
-        public async Task<IEnumerable<Rate>> GetRates()
+        public async Task<List<Rate>> GetRates()
         {
             var tasks = new List<Task<List<Rate>>>
             {
