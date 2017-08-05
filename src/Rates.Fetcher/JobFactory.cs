@@ -2,24 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Quartz;
-using Rates.Core;
+using Autofac;
 
 namespace Rates.Fetcher
 {
     public class JobFactory : IJobFactory
     {
-        private readonly RatesFetcher _ratesService;
-        private readonly Database _database;
-        private readonly Mediator _mediator;
+        private readonly IContainer _container;
 
-        public JobFactory(RatesFetcher ratesService, Database database, Mediator mediator)
+        public JobFactory(IContainer container)
         {
-            _ratesService = ratesService;
-            _database = database;
-            _mediator = mediator;
+            _container = container;
         }
 
         public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
@@ -27,14 +21,10 @@ namespace Rates.Fetcher
             var jobDetail = bundle.JobDetail;
             Type jobType = jobDetail.JobType;
 
-            if (jobType == typeof(RateFetcherJob))
+            using(var scope = _container.BeginLifetimeScope())
             {
-                var job = new RateFetcherJob(_database, _ratesService, _mediator);
+                var job = (IJob)_container.Resolve(jobType);
                 return job;
-            }
-            else
-            {
-                throw new Exception($"Job type {jobType.Name} is not supported");
             }
         }
 

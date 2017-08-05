@@ -1,14 +1,11 @@
-﻿using MongoDB.Driver;
+﻿using Autofac;
+using MongoDB.Driver;
 using Quartz;
 using Quartz.Impl;
 using Rates.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Rates.Fetcher.Services;
 using System.Net.Http;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rates.Fetcher
 {
@@ -24,12 +21,30 @@ namespace Rates.Fetcher
             // Grab the Scheduler instance from the Factory 
             _scheduler = StdSchedulerFactory.GetDefaultScheduler();
 
-            var database = new Database(new MongoClient(Constants.ConnectionString), Constants.Database);
-            var ratesService = new RatesFetcher(Constants.OpenExchangeRatesAppId, new HttpClient());
-            var rateAddedHandler = new RateAddedHandler(database);
-            var mediator = new Mediator(rateAddedHandler);
+            var builder = new ContainerBuilder();
 
-            _scheduler.JobFactory = new JobFactory(ratesService, database, mediator);
+            builder.RegisterInstance(new MongoClient(Constants.ConnectionString));
+            builder.Register(c => new Database(c.Resolve<MongoClient>(), Constants.Database))
+                   .SingleInstance();
+            builder.RegisterType<HttpClient>()
+                    .SingleInstance();
+            builder.RegisterType<CoinMarketCapService>()
+                   .SingleInstance();
+            builder.Register(c => new OpenExchangeRatesService(Constants.OpenExchangeRatesAppId, c.Resolve<HttpClient>()))
+                   .SingleInstance();
+            builder.RegisterType<RatesFetcher>()
+                   .SingleInstance();
+            builder.RegisterType<RateAddedHandler>()
+                   .SingleInstance();
+            builder.RegisterType<Mediator>()
+                   .SingleInstance();
+
+            builder.RegisterType<RateFetcherJob>()
+                   .SingleInstance();
+
+            var container = builder.Build();
+
+            _scheduler.JobFactory = new JobFactory(container);
         }
 
         public void Start()
@@ -65,7 +80,7 @@ namespace Rates.Fetcher
                 .WithIdentity("trigger1", "group1")
                 .StartAt(DateBuilder.EvenHourDateAfterNow())
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInHours(1)
+                    .WithIntervalInMinutes(30)
                     .RepeatForever())
                 .Build();
             }

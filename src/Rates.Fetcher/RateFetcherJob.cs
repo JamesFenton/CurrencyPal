@@ -35,7 +35,10 @@ namespace Rates.Fetcher
                     .ToList()
                     .ForEach(e => _mediator.Send(e));
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
     }
 }
