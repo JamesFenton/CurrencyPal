@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Rates.Web.Dto;
 using Rates.Core;
 using MongoDB.Driver;
-using Rates.Core.ReadModel;
 
 namespace Rates.Web.Services
 {
@@ -20,7 +19,10 @@ namespace Rates.Web.Services
 
         public RatesDto GetRates()
         {
-            var rates = _database.RatesRm.AsQueryable().ToList();
+            var minimumTime = DateTime.UtcNow.AddHours(-6);
+            var rates = _database.RatesRm.AsQueryable()
+                                         .Where(r => r.Timestamp > minimumTime)
+                                         .ToList();
 
             var orderedRates = Constants.FiatTickers
                 .Concat(Constants.CryptoTickers)
