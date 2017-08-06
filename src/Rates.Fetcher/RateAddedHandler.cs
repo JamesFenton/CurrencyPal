@@ -30,28 +30,28 @@ namespace Rates.Fetcher
             // Get historical rates
             var rate1DayAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddDays(-1))
+                .Where(r => r.Ticker == ticker && now.AddDays(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddDays(-1))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
             var oneDayChange = GetChange(e.Value, rate1DayAgo?.Value);
 
             var rate1WeekAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddDays(-7))
+                .Where(r => r.Ticker == ticker && now.AddDays(-7).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddDays(-7))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
             var oneWeekChange = GetChange(e.Value, rate1WeekAgo?.Value);
 
             var rate1MonthAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddMonths(-1))
+                .Where(r => r.Ticker == ticker && now.AddMonths(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-1))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
             var oneMonthChange = GetChange(e.Value, rate1MonthAgo?.Value);
 
             var rate1YearAgo = _database.Rates
                 .AsQueryable()
-                .Where(r => r.Ticker == ticker && r.Timestamp <= now.AddYears(-1))
+                .Where(r => r.Ticker == ticker && now.AddYears(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddYears(-1))
                 .OrderByDescending(r => r.Timestamp)
                 .FirstOrDefault();
             var oneYearChange = GetChange(e.Value, rate1YearAgo?.Value);
