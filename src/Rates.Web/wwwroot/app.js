@@ -32,8 +32,9 @@ var app = new Vue({
         round: function (value) {
             if (!value) 
                 return '';
-            var rounded = value.toFixed(2);
-            return rounded;
+            if (value < 1)
+                return value.toFixed(4);
+            return value.toFixed(2);
         },
         roundedPercentage: function (value) {
             if (!value)
