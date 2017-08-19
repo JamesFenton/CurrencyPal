@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" 
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" 
-          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" 
-          crossorigin="anonymous">
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" 
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" 
+        crossorigin="anonymous">
 
     <link rel="stylesheet" href="site.css" />
 
@@ -34,7 +34,13 @@
                             <th>Ticker</th>
                             <th>Rate</th>
                             <th>1d</th>
-                            <th>1w</th>
+                            <th>
+                                <select class="form-control form-control-sm" v-model="changePeriod">
+                                    <option>1w</option>
+                                    <option>1m</option>
+                                    <option>1y</option>
+                                </select>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,8 +50,14 @@
                             <td v-bind:class="[rate.change1Day > 0 ? 'positive-change' : '', rate.change1Day < 0 ? 'negative-change' : '']">
                                 {{rate.change1Day | roundedPercentage}}
                             </td>
-                            <td v-bind:class="[rate.change1Week > 0 ? 'positive-change' : '', rate.change1Week < 0 ? 'negative-change' : '']">
+                            <td v-if="changePeriod === '1w'" v-bind:class="[rate.change1Week > 0 ? 'positive-change' : '', rate.change1Week < 0 ? 'negative-change' : '']">
                                 {{rate.change1Week | roundedPercentage}}
+                            </td>
+                            <td v-if="changePeriod === '1m'" v-bind:class="[rate.change1Month > 0 ? 'positive-change' : '', rate.change1Month < 0 ? 'negative-change' : '']">
+                                {{rate.change1Month | roundedPercentage}}
+                            </td>
+                            <td v-if="changePeriod === '1y'" v-bind:class="[rate.change1Year > 0 ? 'positive-change' : '', rate.change1Year < 0 ? 'negative-change' : '']">
+                                {{rate.change1Year | roundedPercentage}}
                             </td>
                         </tr>
                     </tbody>

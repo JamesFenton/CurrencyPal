@@ -5,6 +5,7 @@ var app = new Vue({
         updateTimeMessage: null,
         nextUpdateTime: 0,
         nextUpdateTimeMessage: null,
+        changePeriod: null,
         requesting: false,
         errorMessage: null
     },
@@ -28,6 +29,11 @@ var app = new Vue({
                 });
         }
     },
+    watch: {
+        changePeriod: function (newValue) {
+            window.localStorage.setItem("changePeriod", this.changePeriod);
+        }
+    },
     filters: {
         round: function (value) {
             if (!value) 
@@ -39,11 +45,14 @@ var app = new Vue({
         roundedPercentage: function (value) {
             if (!value)
                 return '';
-            var rounded = (value * 100).toFixed(2) + '%';
+            var rounded = value.toFixed(2) + '%';
             return rounded;
         }
     },
     created: function() {
         this.getRates();
+        this.changePeriod = window.localStorage.getItem("changePeriod");
+        if (!this.changePeriod)
+            this.changePeriod = "1w";
     }
 })
