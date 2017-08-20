@@ -80,7 +80,7 @@ namespace Rates.Fetcher
                 .WithIdentity("trigger1", "group1")
                 .StartAt(DateBuilder.EvenHourDateAfterNow())
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(30)
+                    .WithIntervalInHours(1)
                     .RepeatForever())
                 .Build();
             }
