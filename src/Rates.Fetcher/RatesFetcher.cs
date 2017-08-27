@@ -23,9 +23,10 @@ namespace Rates.Fetcher
 
         public async Task<List<Rate>> GetRates()
         {
+            var openExchangeRateTickers = Constants.FiatTickers.Concat(Constants.MetalsTickers);
             var tasks = new List<Task<List<Rate>>>
             {
-                _openExchangeRatesService.GetExchangeRates(Constants.FiatTickers),
+                _openExchangeRatesService.GetExchangeRates(openExchangeRateTickers),
                 _coinMarketCapService.GetCryptoCurrencies(Constants.CryptoTickers),
             };
 
