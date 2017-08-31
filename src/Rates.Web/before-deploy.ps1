@@ -3,3 +3,4 @@
 
 Write-Host "Stopping Website"
 Stop-WebAppPool Rates
+Start-Sleep -Seconds 1

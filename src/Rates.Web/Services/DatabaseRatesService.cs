@@ -32,7 +32,7 @@ namespace Rates.Web.Services
             
             return new RatesDto
             {
-                Rates = rates,
+                Rates = orderedRates,
                 UpdateTime = ((DateTimeOffset)rates.Min(r => r.Timestamp)).ToUnixTimeMilliseconds()
             };
         }
