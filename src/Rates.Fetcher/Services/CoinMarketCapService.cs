@@ -40,8 +40,8 @@ namespace Rates.Fetcher.Services
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
-                    case "EOSUSD":
-                        coinmarketcapTicker = "eos";
+                    case "NAVUSD":
+                        coinmarketcapTicker = "nav-coin";
                         break;
                     case "SIGTUSD":
                         coinmarketcapTicker = "signatum";
