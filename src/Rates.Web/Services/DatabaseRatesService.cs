@@ -25,6 +25,7 @@ namespace Rates.Web.Services
                                          .ToList();
 
             var orderedRates = Constants.FiatTickers
+                .Concat(Constants.MetalsTickers)
                 .Concat(Constants.CryptoTickers)
                 .Select(ticker => rates.FirstOrDefault(r => r.Ticker == ticker))
                 .Where(r => r != null)
