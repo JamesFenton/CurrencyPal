@@ -40,6 +40,9 @@ namespace Rates.Fetcher.Services
                     case "LTCUSD":
                         coinmarketcapTicker = "litecoin";
                         break;
+                    case "XEMUSD":
+                        coinmarketcapTicker = "nem";
+                        break;
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
