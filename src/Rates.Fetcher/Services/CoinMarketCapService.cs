@@ -40,17 +40,11 @@ namespace Rates.Fetcher.Services
                     case "LTCUSD":
                         coinmarketcapTicker = "litecoin";
                         break;
-                    case "XEMUSD":
-                        coinmarketcapTicker = "nem";
-                        break;
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
                     case "NAVUSD":
                         coinmarketcapTicker = "nav-coin";
-                        break;
-                    case "SIGTUSD":
-                        coinmarketcapTicker = "signatum";
                         break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
