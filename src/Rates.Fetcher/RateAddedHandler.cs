@@ -49,6 +49,20 @@ namespace Rates.Fetcher
                 .FirstOrDefault();
             var oneMonthChange = GetChangePercent(e.Value, rate1MonthAgo?.Value);
 
+            var rate3MonthsAgo = _database.Rates
+                .AsQueryable()
+                .Where(r => r.Ticker == ticker && now.AddMonths(-3).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-3))
+                .OrderByDescending(r => r.Timestamp)
+                .FirstOrDefault();
+            var threeMonthChange = GetChangePercent(e.Value, rate3MonthsAgo?.Value);
+
+            var rate6MonthsAgo = _database.Rates
+                .AsQueryable()
+                .Where(r => r.Ticker == ticker && now.AddMonths(-6).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-6))
+                .OrderByDescending(r => r.Timestamp)
+                .FirstOrDefault();
+            var sixMonthChange = GetChangePercent(e.Value, rate6MonthsAgo?.Value);
+
             var rate1YearAgo = _database.Rates
                 .AsQueryable()
                 .Where(r => r.Ticker == ticker && now.AddYears(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddYears(-1))
@@ -62,14 +76,16 @@ namespace Rates.Fetcher
                 .FirstOrDefault(r => r.Ticker == e.Ticker);
 
             var updatedRate = new RateRm(
-                    existing?.Id ?? Guid.NewGuid(),
-                    e.Ticker,
-                    e.Timestamp,
-                    e.Value,
-                    oneDayChange,
-                    oneWeekChange,
-                    oneMonthChange,
-                    oneYearChange);
+                    id: existing?.Id ?? Guid.NewGuid(),
+                    ticker: e.Ticker,
+                    timestamp: e.Timestamp,
+                    value: e.Value,
+                    change1Day: oneDayChange,
+                    change1Week: oneWeekChange,
+                    change1Month: oneMonthChange,
+                    change3Months: threeMonthChange,
+                    change6Months: sixMonthChange,
+                    change1Year: oneYearChange);
 
             if (existing == null)
             {
