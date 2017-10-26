@@ -43,9 +43,6 @@ namespace Rates.Fetcher.Services
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
-                    case "NAVUSD":
-                        coinmarketcapTicker = "nav-coin";
-                        break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
                 }
