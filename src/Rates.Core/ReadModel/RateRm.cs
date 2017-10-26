@@ -8,17 +8,19 @@ namespace Rates.Core.ReadModel
 {
     public class RateRm
     {
-        public Guid Id { get; }
-        public string Ticker { get; }
-        public DateTime Timestamp { get; }
-        public double Value { get; }
+        public Guid Id { get; set; }
+        public string Ticker { get; set; }
+        public DateTime Timestamp { get; set; }
+        public double Value { get; set; }
 
-        public double? Change1Day { get; }
-        public double? Change1Week { get; }
-        public double? Change1Month { get; }
-        public double? Change3Months { get; }
-        public double? Change6Months { get; }
-        public double? Change1Year { get; }
+        public double? Change1Day { get; set; }
+        public double? Change1Week { get; set; }
+        public double? Change1Month { get; set; }
+        public double? Change3Months { get; set; }
+        public double? Change6Months { get; set; }
+        public double? Change1Year { get; set; }
+
+        public RateRm() { }
 
         public RateRm(
             Guid id,
