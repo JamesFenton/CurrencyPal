@@ -36,14 +36,14 @@ var app = new Vue({
     },
     filters: {
         round: function (value) {
-            if (!value) 
+            if (value == null) 
                 return '';
             if (value < 1)
                 return value.toFixed(4);
             return value.toFixed(2);
         },
         roundedPercentage: function (value) {
-            if (!value)
+            if (value == null)
                 return '';
             var rounded = value.toFixed(2) + '%';
             return rounded;
