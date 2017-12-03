@@ -43,6 +43,9 @@ namespace Rates.Fetcher.Services
                     case "ZECUSD":
                         coinmarketcapTicker = "zcash";
                         break;
+                    case "XMRUSD":
+                        coinmarketcapTicker = "monero";
+                        break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
                 }
