@@ -46,6 +46,9 @@ namespace Rates.Fetcher.Services
                     case "XMRUSD":
                         coinmarketcapTicker = "monero";
                         break;
+                    case "NEOUSD":
+                        coinmarketcapTicker = "neo";
+                        break;
                     default:
                         throw new ArgumentException("Invalid ticker: " + ticker);
                 }
