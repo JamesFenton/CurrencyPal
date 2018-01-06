@@ -46,6 +46,9 @@ namespace Rates.Fetcher.Services
                     case "XMRUSD":
                         coinmarketcapTicker = "monero";
                         break;
+                    case "NAVUSD":
+                        coinmarketcapTicker = "nav-coin";
+                        break;
                     case "NEOUSD":
                         coinmarketcapTicker = "neo";
                         break;
