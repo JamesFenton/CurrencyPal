@@ -13,6 +13,7 @@ namespace Rates.Fetcher
             if (developerMode)
             {
                 service.Start();
+                Console.ReadLine();
             }
             else
             {

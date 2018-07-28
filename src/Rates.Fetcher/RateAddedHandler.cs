@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Fetcher
 {
-    public class RateAddedHandler
+    public class RateAddedHandler : IHandler<RateAdded>
     {
         private readonly Database _database;
 
@@ -19,7 +19,7 @@ namespace Rates.Fetcher
             _database = database;
         }
 
-        public void Handle(RateAdded e)
+        public Task Handle(RateAdded e)
         {
             var ticker = e.Ticker;
 
@@ -97,6 +97,8 @@ namespace Rates.Fetcher
                     Builders<RateRm>.Filter.Eq(r => r.Id, existing.Id),
                     updatedRate);
             }
+
+            return Task.CompletedTask;
         }
 
         private double? GetChangePercent(double rateNow, double? rateThen)

@@ -27,5 +27,5 @@ Pop-Location
 Test-ExitCode $lastExitCode
 
 # zip fetcher
-7z a "Rates.Fetcher.$version.zip" .\src\Rates.Fetcher\bin\Debug\net461\win7-x86\**
+7z a "Rates.Fetcher.$version.zip" .\src\Rates.Fetcher\bin\Debug\net461\**
 Test-ExitCode $lastExitCode
