@@ -11,7 +11,7 @@ dotnet restore
 Test-ExitCode $lastExitCode
 
 # build
-dotnet build
+dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
@@ -27,5 +27,5 @@ Pop-Location
 Test-ExitCode $lastExitCode
 
 # zip fetcher
-7z a "Rates.Fetcher.$version.zip" .\src\Rates.Fetcher\bin\Debug\net461\**
+7z a "Rates.Fetcher.$version.zip" .\src\Rates.Fetcher\bin\Release\net461\win7-x86\**
 Test-ExitCode $lastExitCode
