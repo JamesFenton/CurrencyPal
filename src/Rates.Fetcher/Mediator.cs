@@ -1,4 +1,5 @@
-﻿using Rates.Core.Events;
+﻿using Rates.Core;
+using Rates.Core.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,21 @@ namespace Rates.Fetcher
 {
     public class Mediator
     {
-        private readonly RateAddedHandler _rateAddedHandler;
+        private readonly IHandler<RateAdded> _rateAddedHandler;
 
-        public Mediator(RateAddedHandler rateAddedHandler)
+        public Mediator(IHandler<RateAdded> rateAddedHandler)
         {
             _rateAddedHandler = rateAddedHandler;
         }
 
-        public void Send(Event e)
+        public Task Send<T>(T @event)
         {
-            switch (e)
+            switch (@event)
             {
                 case RateAdded r:
-                    _rateAddedHandler.Handle(r);
-                    break;
+                    return _rateAddedHandler.Handle(r);
                 default:
-                    throw new InvalidOperationException($"Cannot send event of type {e.GetType().Name}");
+                    throw new InvalidOperationException($"Cannot send event of type {@event.GetType().Name}");
             }
         }
     }

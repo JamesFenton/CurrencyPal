@@ -24,16 +24,16 @@ namespace Rates.Fetcher
             _mediator = mediator;
         }
 
-        public void Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                var rates = _ratesService.GetRates().Result;
+                var rates = await _ratesService.GetRates();
                 _database.Rates.InsertMany(rates);
 
-                rates.SelectMany(r => r.GetEvents())
-                    .ToList()
-                    .ForEach(e => _mediator.Send(e));
+                var tasks = rates.SelectMany(r => r.GetEvents())
+                                 .Select(e => _mediator.Send(e));
+                await Task.WhenAll(tasks);
             }
             catch (Exception e)
             {
