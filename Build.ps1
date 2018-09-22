@@ -9,10 +9,6 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
-Write-Host "Running build for version $version"
-Write-Host "PowerShell version"
-$PSVersionTable
-
 # restore
 dotnet restore
 Test-ExitCode $lastExitCode

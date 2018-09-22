@@ -13,11 +13,11 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: Publish Rates.Web
   inputs:
-     pathtoPublish: '\publish\Rates.Web' 
+     pathtoPublish: 'publish\Rates.Web' 
      artifactName: 'Rates.Web' 
 
 - task: PublishBuildArtifacts@1
   displayName: Publish Rates.Fetcher
   inputs:
-     pathtoPublish: '\src\Rates.Fetcher\bin\Release\net461' 
+     pathtoPublish: 'src\Rates.Fetcher\bin\Release\net461' 
      artifactName: 'Rates.Fetcher' 
