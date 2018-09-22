@@ -9,6 +9,8 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
+Write-Host "Running build for version $version"
+
 # restore
 dotnet restore
 Test-ExitCode $lastExitCode
@@ -18,7 +20,7 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-dotnet publish "$PSScriptRoot\publish\web" -o $outputDirectory -c Release
+dotnet publish "$PSScriptRoot\src\Rates.Web" -o $outputDirectory -c Release
 Test-ExitCode $lastExitCode
 $version | Out-File "$webPublishDirectory\version.txt"
 
