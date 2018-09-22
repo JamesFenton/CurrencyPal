@@ -7,7 +7,7 @@ pool:
   vmImage: 'VS2017-Win2016'
 
 variables:
-  ratesVersion: 0.4.$(Build.BuildId)
+  ratesVersion: 0.4.$(BuildID)
 
 name: $(ratesVersion)
 
