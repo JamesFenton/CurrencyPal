@@ -7,4 +7,6 @@ pool:
   vmImage: 'VS2017-Win2016'
 
 steps:
-- powershell: .\Build.ps1 -version $(Build.BuildId)
+- powershell: .\Build.ps1 -version $(Build.BuildId) -outputDirectory $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
