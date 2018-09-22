@@ -6,8 +6,13 @@
 pool:
   vmImage: 'VS2017-Win2016'
 
+variables:
+  version: 0.4.0
+
+name: $(version).$(Build.BuildId)
+
 steps:
-- powershell: .\Build.ps1 -version $(Build.BuildId)
+- powershell: .\Build.ps1 -buildVersion $(version) -buildCounter $(Build.BuildId)
   displayName: Build.ps1
 
 - task: PublishBuildArtifacts@1

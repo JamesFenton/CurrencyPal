@@ -1,5 +1,6 @@
 param(
-	$version = $env:APPVEYOR_BUILD_VERSION,
+	$buildVersion = $env:APPVEYOR_BUILD_VERSION,
+	$buildCounter = 0,
 	$artifactDirectory = "$PSScriptRoot\artifacts"
 )
 
@@ -9,6 +10,7 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
+$version = "$buildVersion.$buildCounter"
 $webPublishDirectory = "$PSScriptRoot\publish\Rates.Web"
 $servicePublishDirectory = "$PSScriptRoot\src\Rates.Fetcher\bin\Release\net461"
 
