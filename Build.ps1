@@ -10,7 +10,7 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
-$version = "$version.$buildCounter"
+$version = "$buildVersion.$buildCounter"
 $webPublishDirectory = "$PSScriptRoot\publish\Rates.Web"
 $servicePublishDirectory = "$PSScriptRoot\src\Rates.Fetcher\bin\Release\net461"
 
