@@ -1,6 +1,6 @@
 param(
 	$version = $env:APPVEYOR_BUILD_VERSION,
-	$outputDirectory = "$PSScriptRoot\publish\web"
+	$artifactDirectory = "$PSScriptRoot\artifacts"
 )
 
 function Test-ExitCode($exitCode) {
@@ -8,6 +8,9 @@ function Test-ExitCode($exitCode) {
 		exit $exitCode
 	}
 }
+
+$webPublishDirectory = "$PSScriptRoot\publish\Rates.Web"
+$servicePublishDirectory = "$PSScriptRoot\src\Rates.Fetcher\bin\Release\net461"
 
 # restore
 dotnet restore
@@ -18,14 +21,19 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-dotnet publish "$PSScriptRoot\publish\web" -o $outputDirectory -c Release
+dotnet publish "$PSScriptRoot\src\Rates.Web" -o $webPublishDirectory -c Release
 Test-ExitCode $lastExitCode
 $version | Out-File "$webPublishDirectory\version.txt"
 
+# create artifact directory
+if (-not (Test-Path $artifactDirectory)) {
+	New-Item -ItemType Directory -Path $artifactDirectory
+}
+
 # zip web
-7z a "Rates.Web.$version.zip" .\publish\web\**
+Compress-Archive $webPublishDirectory\** "$artifactDirectory\Rates.Web.$version.zip"
 Test-ExitCode $lastExitCode
 
 # zip fetcher
-7z a "Rates.Fetcher.$version.zip" .\src\Rates.Fetcher\bin\Release\net461\**
+Compress-Archive $servicePublishDirectory\** "$artifactDirectory\Rates.Fetcher.$version.zip"
 Test-ExitCode $lastExitCode
