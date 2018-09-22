@@ -1,4 +1,7 @@
-$version = $env:APPVEYOR_BUILD_VERSION
+param(
+	$version = $env:APPVEYOR_BUILD_VERSION,
+	$outputDirectory = "$PSScriptRoot\publish\web"
+)
 
 function Test-ExitCode($exitCode) {
 	if ($exitCode -ne 0) {
@@ -15,12 +18,9 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-$webPublishDirectory = "$PSScriptRoot\publish\web"
-Push-Location "$PSScriptRoot\src\Rates.Web"
-dotnet publish -o $webPublishDirectory -c Release
+dotnet publish "$PSScriptRoot\publish\web" -o $outputDirectory -c Release
 Test-ExitCode $lastExitCode
 $version | Out-File "$webPublishDirectory\version.txt"
-Pop-Location
 
 # zip web
 7z a "Rates.Web.$version.zip" .\publish\web\**
