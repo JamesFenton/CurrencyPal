@@ -14,4 +14,4 @@ steps:
   displayName: Publish artifacts
   inputs:
      pathtoPublish: 'artifacts\' 
-     artifactName: 'Rates'
+     artifactName: 'artifacts'

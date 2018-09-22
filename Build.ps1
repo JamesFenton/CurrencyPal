@@ -26,7 +26,9 @@ Test-ExitCode $lastExitCode
 $version | Out-File "$webPublishDirectory\version.txt"
 
 # create artifact directory
-New-Item -ItemType Directory -Path $artifactDirectory
+if (-not (Test-Path $artifactDirectory)) {
+	New-Item -ItemType Directory -Path $artifactDirectory
+}
 
 # zip web
 Compress-Archive $webPublishDirectory\** "$artifactDirectory\Rates.Web.$version.zip"
