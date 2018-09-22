@@ -1,6 +1,6 @@
 param(
 	$version = $env:APPVEYOR_BUILD_VERSION,
-	$outputDirectory = "$PSScriptRoot\publish\Rates.Web"
+	$webPublishDirectory = "$PSScriptRoot\publish\Rates.Web"
 )
 
 function Test-ExitCode($exitCode) {
@@ -22,7 +22,7 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-dotnet publish "$PSScriptRoot\src\Rates.Web" -o $outputDirectory -c Release
+dotnet publish "$PSScriptRoot\src\Rates.Web" -o $webPublishDirectory -c Release
 Test-ExitCode $lastExitCode
 $version | Out-File "$webPublishDirectory\version.txt"
 
