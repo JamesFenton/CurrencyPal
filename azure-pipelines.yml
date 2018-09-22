@@ -11,13 +11,7 @@ steps:
   displayName: Build.ps1
 
 - task: PublishBuildArtifacts@1
-  displayName: Publish Rates.Web
+  displayName: Publish artifacts
   inputs:
-     pathtoPublish: 'publish\Rates.Web' 
-     artifactName: 'Rates.Web' 
-
-- task: PublishBuildArtifacts@1
-  displayName: Publish Rates.Fetcher
-  inputs:
-     pathtoPublish: 'src\Rates.Fetcher\bin\Release\net461' 
-     artifactName: 'Rates.Fetcher' 
+     pathtoPublish: 'artifacts\' 
+     artifactName: 'Rates'
