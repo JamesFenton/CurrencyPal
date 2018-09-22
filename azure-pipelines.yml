@@ -6,22 +6,18 @@
 pool:
   vmImage: 'VS2017-Win2016'
 
-variables:
-  webArtifactDirectory: '$(Agent.BuildDirectory)\publish\Rates.Web'
-  fetcherArtifactDirectory: '$(Agent.BuildDirectory)\src\Rates.Fetcher\bin\Release\net461'
-
 steps:
-- powershell: .\Build.ps1 -version $(Build.BuildId) -webPublishDirectory $(webPublishDirectory)
+- powershell: .\Build.ps1 -version $(Build.BuildId)
   displayName: Build.ps1
 
 - task: PublishBuildArtifacts@1
   displayName: Publish Rates.Web
   inputs:
-     pathtoPublish: '$(webPublishDirectory)' 
+     pathtoPublish: '$(Agent.BuildDirectory)\publish\Rates.Web' 
      artifactName: 'Rates.Web' 
 
 - task: PublishBuildArtifacts@1
   displayName: Publish Rates.Fetcher
   inputs:
-     pathtoPublish: '$(fetcherArtifactDirectory)' 
+     pathtoPublish: '$(Agent.BuildDirectory)\src\Rates.Fetcher\bin\Release\net461' 
      artifactName: 'Rates.Fetcher' 
