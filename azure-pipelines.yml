@@ -7,12 +7,12 @@ pool:
   vmImage: 'VS2017-Win2016'
 
 variables:
-  ratesVersion: 0.4.0
+  version: 0.4.0
 
 name: $(ratesVersion).$(Build.BuildId)
 
 steps:
-- powershell: .\Build.ps1 -version $(ratesVersion)
+- powershell: .\Build.ps1 -buildVersion $(version)
   displayName: Build.ps1
 
 - task: PublishBuildArtifacts@1
