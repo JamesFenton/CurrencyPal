@@ -1,6 +1,6 @@
 param(
 	$version = $env:APPVEYOR_BUILD_VERSION,
-	$outputDirectory = "$PSScriptRoot\publish\web"
+	$outputDirectory = "$PSScriptRoot\publish\Rates.Web"
 )
 
 function Test-ExitCode($exitCode) {
@@ -10,6 +10,8 @@ function Test-ExitCode($exitCode) {
 }
 
 Write-Host "Running build for version $version"
+Write-Host "PowerShell version"
+$PSVersionTable
 
 # restore
 dotnet restore

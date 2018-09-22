@@ -10,3 +10,13 @@ steps:
 - powershell: .\Build.ps1 -version $(Build.BuildId) -outputDirectory $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
+  displayName: Publish Rates.Web
+  inputs:
+     pathtoPublish: '$(Agent.BuildDirectory)\publish\Rates.Web' 
+     artifactName: 'Rates.Web' 
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Rates.Fetcher
+  inputs:
+     pathtoPublish: '$(Agent.BuildDirectory)\src\Rates.Fetcher\bin\Release\net461' 
+     artifactName: 'Rates.Fetcher' 

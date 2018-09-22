@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{96EC2669-1098-43DD-8071-CBD3312CE4E9}"
 EndProject
@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEE5D946-5A46-41A5-826F-7288663978DB}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		azure-pipelines.yml = azure-pipelines.yml
 		Build.ps1 = Build.ps1
 		Readme.md = Readme.md
 	EndProjectSection
@@ -44,5 +45,8 @@ Global
 		{F406FD27-80AC-4832-9ADB-EB6F027D6C8C} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
 		{39B230E8-40CB-4EF0-B040-B934DB528BEB} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
 		{F4DDA143-86B2-41F5-A553-C9880D066F23} = {96EC2669-1098-43DD-8071-CBD3312CE4E9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D0787966-1C6D-4E0A-85BD-C50FBF956F0B}
 	EndGlobalSection
 EndGlobal
