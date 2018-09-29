@@ -28,4 +28,4 @@ Compress-Archive $functionsPublishDirectory\** "$artifactDirectory\Rates.Functio
 Test-ExitCode $lastExitCode
 
 # zip front-end
-Copy-Item "$PSScriptRoot\src\Rates.Functions\wwwroot" "$artifactDirectory\Rates.Web.$version" -Recurse
+Copy-Item "$PSScriptRoot\src\Rates.Functions\wwwroot" "$artifactDirectory\Rates.Web" -Recurse
