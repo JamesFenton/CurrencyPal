@@ -13,14 +13,6 @@ function Test-ExitCode($exitCode) {
 $version = "$buildVersion.$buildCounter"
 $functionsPublishDirectory = "$PSScriptRoot\publish\Rates.Functions"
 
-# restore
-dotnet restore
-Test-ExitCode $lastExitCode
-
-# build
-dotnet build --configuration Release
-Test-ExitCode $lastExitCode
-
 # publish web
 dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $functionsPublishDirectory -c Release
 Test-ExitCode $lastExitCode
