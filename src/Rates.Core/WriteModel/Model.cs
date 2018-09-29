@@ -9,7 +9,7 @@ namespace Rates.Core.WriteModel
 {
     public abstract class Model
     {
-        private List<Event> _events = new List<Event>();
+        private readonly List<Event> _events = new List<Event>();
 
         protected void AddEvent(Event e) => _events.Add(e);
 

@@ -23,9 +23,8 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-dotnet publish "$PSScriptRoot\src\Rates.Web" -o $webPublishDirectory -c Release
+dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $webPublishDirectory -c Release
 Test-ExitCode $lastExitCode
-$version | Out-File "$webPublishDirectory\version.txt"
 
 # create artifact directory
 if (-not (Test-Path $artifactDirectory)) {
@@ -33,9 +32,5 @@ if (-not (Test-Path $artifactDirectory)) {
 }
 
 # zip web
-Compress-Archive $webPublishDirectory\** "$artifactDirectory\Rates.Web.$version.zip"
-Test-ExitCode $lastExitCode
-
-# zip fetcher
-Compress-Archive $servicePublishDirectory\** "$artifactDirectory\Rates.Fetcher.$version.zip"
+Compress-Archive $webPublishDirectory\** "$artifactDirectory\Rates.Functions.$version.zip"
 Test-ExitCode $lastExitCode
