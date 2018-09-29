@@ -18,15 +18,8 @@ namespace Rates.Functions.BackEnd
         {
             var rateAdded = JsonConvert.DeserializeObject<RateAdded>(myQueueItem, Lookups.JsonSettings);
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
-
-            var command = new Domain.Commands.RateAdded.Command
-            {
-                Id = rateAdded.Id,
-                Ticker = rateAdded.Ticker,
-                Timestamp = rateAdded.Timestamp,
-                Value = rateAdded.Value,
-            };
-            await mediator.Send(command);
+            
+            await mediator.Send(rateAdded);
             log.Info($"Rate {rateAdded.Ticker} handled successfully");
         }
     }

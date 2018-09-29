@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using MongoDB.Driver;
 using Rates.Core;
-using Rates.Core.Events;
 using Rates.Core.ReadModel;
 using System;
 using System.Collections.Generic;
@@ -10,19 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rates.Domain.Commands
+namespace Rates.Domain.WriteModel
 {
     public class RateAdded
     {
-        public class Command : IRequest
-        {
-            public Guid Id { get; set; }
-            public string Ticker { get; set; }
-            public DateTime Timestamp { get; set; }
-            public double Value { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Core.Events.RateAdded>
         {
             private readonly Database _database;
 
@@ -31,7 +22,7 @@ namespace Rates.Domain.Commands
                 _database = database;
             }
 
-            public Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public Task<Unit> Handle(Core.Events.RateAdded request, CancellationToken cancellationToken)
             {
                 var e = request;
                 var ticker = e.Ticker;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Core.Events
 {
-    public abstract class Event
+    public abstract class Event : IRequest
     {
     }
 }

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rates.Domain.Queries
+namespace Rates.Domain.ReadModel
 {
     public class GetRates
     {

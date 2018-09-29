@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rates.Domain.Commands
+namespace Rates.Domain.WriteModel
 {
     public class FetchRates
     {
