@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Rates.Core;
-using Rates.Fetcher;
+using Rates.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;

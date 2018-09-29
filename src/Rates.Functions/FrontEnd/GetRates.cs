@@ -19,7 +19,7 @@ namespace Rates.Functions.FrontEnd
         {
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
             
-            var query = new Rates.Fetcher.Queries.GetRates.Query();
+            var query = new Domain.Queries.GetRates.Query();
             var response = await mediator.Send(query);
             
             return req.CreateResponse(HttpStatusCode.OK, response, Lookups.JsonFormatter);

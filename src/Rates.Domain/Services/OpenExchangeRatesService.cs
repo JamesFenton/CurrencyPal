@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Fetcher.Services
+namespace Rates.Domain.Services
 {
     public class OpenExchangeRatesService
     {

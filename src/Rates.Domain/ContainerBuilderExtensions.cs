@@ -2,8 +2,7 @@
 using MediatR;
 using MongoDB.Driver;
 using Rates.Core;
-using Rates.Fetcher.Commands;
-using Rates.Fetcher.Services;
+using Rates.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Fetcher
+namespace Rates.Domain
 {
     public static class ContainerBuilderExtensions
     {

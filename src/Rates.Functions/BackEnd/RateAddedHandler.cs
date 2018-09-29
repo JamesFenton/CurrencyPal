@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
-using Rates.Fetcher.Commands;
+using Rates.Core.Events;
 
 namespace Rates.Functions.BackEnd
 {
@@ -16,10 +16,17 @@ namespace Rates.Functions.BackEnd
             [QueueTrigger(Lookups.RatesAddedQueue)]string myQueueItem, 
             TraceWriter log)
         {
-            var rateAdded = JsonConvert.DeserializeObject<RateAdded.Command>(myQueueItem, Lookups.JsonSettings);
+            var rateAdded = JsonConvert.DeserializeObject<RateAdded>(myQueueItem, Lookups.JsonSettings);
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
 
-            await mediator.Send(rateAdded);
+            var command = new Domain.Commands.RateAdded.Command
+            {
+                Id = rateAdded.Id,
+                Ticker = rateAdded.Ticker,
+                Timestamp = rateAdded.Timestamp,
+                Value = rateAdded.Value,
+            };
+            await mediator.Send(command);
             log.Info($"Rate {rateAdded.Ticker} handled successfully");
         }
     }

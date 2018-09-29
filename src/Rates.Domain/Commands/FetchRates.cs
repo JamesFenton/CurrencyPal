@@ -2,7 +2,7 @@
 using Rates.Core;
 using Rates.Core.Events;
 using Rates.Core.WriteModel;
-using Rates.Fetcher.Services;
+using Rates.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rates.Fetcher.Commands
+namespace Rates.Domain.Commands
 {
     public class FetchRates
     {

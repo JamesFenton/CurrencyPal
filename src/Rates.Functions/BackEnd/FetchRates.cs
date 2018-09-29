@@ -20,7 +20,7 @@ namespace Rates.Functions.BackEnd
         {
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
 
-            var events = await mediator.Send(new Rates.Fetcher.Commands.FetchRates.Command());
+            var events = await mediator.Send(new Domain.Commands.FetchRates.Command());
             
             log.Info($"Sending {events.Count()} events to {Lookups.RatesAddedQueue} queue");
             foreach (var @event in events)
