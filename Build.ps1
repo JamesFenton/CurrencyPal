@@ -1,5 +1,5 @@
 param(
-	$buildVersion = $env:APPVEYOR_BUILD_VERSION,
+	$buildVersion = "0.0.1",
 	$buildCounter = 0,
 	$artifactDirectory = "$PSScriptRoot\artifacts"
 )
@@ -19,7 +19,7 @@ Test-ExitCode $lastExitCode
 
 # create artifact directory
 if (Test-Path $artifactDirectory) {
-	Remove-Item $artifactDirectory -Force
+	Remove-Item $artifactDirectory -Recurse -Force
 }
 New-Item -ItemType Directory -Path $artifactDirectory
 
@@ -28,4 +28,4 @@ Compress-Archive $functionsPublishDirectory\** "$artifactDirectory\Rates.Functio
 Test-ExitCode $lastExitCode
 
 # zip front-end
-Compress-Archive "$PSScriptRoot\src\Rates.Functions\wwwroot\**" "$artifactDirectory\Rates.Web.$version.zip"
+Copy-Item "$PSScriptRoot\src\Rates.Functions\wwwroot" "$artifactDirectory\Rates.Web.$version" -Recurse
