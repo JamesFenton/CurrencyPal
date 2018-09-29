@@ -29,3 +29,5 @@ Test-ExitCode $lastExitCode
 
 # zip front-end
 Copy-Item "$PSScriptRoot\src\Rates.Functions\wwwroot" "$artifactDirectory\Rates.Web" -Recurse
+
+Copy-Item "$PSScriptRoot\Deploy.ps1" $artifactDirectory
