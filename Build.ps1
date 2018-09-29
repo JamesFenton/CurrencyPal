@@ -11,8 +11,7 @@ function Test-ExitCode($exitCode) {
 }
 
 $version = "$buildVersion.$buildCounter"
-$webPublishDirectory = "$PSScriptRoot\publish\Rates.Web"
-$servicePublishDirectory = "$PSScriptRoot\src\Rates.Fetcher\bin\Release\net461"
+$functionsPublishDirectory = "$PSScriptRoot\publish\Rates.Functions"
 
 # restore
 dotnet restore
@@ -23,14 +22,18 @@ dotnet build --configuration Release
 Test-ExitCode $lastExitCode
 
 # publish web
-dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $webPublishDirectory -c Release
+dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $functionsPublishDirectory -c Release
 Test-ExitCode $lastExitCode
 
 # create artifact directory
-if (-not (Test-Path $artifactDirectory)) {
-	New-Item -ItemType Directory -Path $artifactDirectory
+if (Test-Path $artifactDirectory) {
+	Remove-Item $artifactDirectory -Force
 }
+New-Item -ItemType Directory -Path $artifactDirectory
 
-# zip web
-Compress-Archive $webPublishDirectory\** "$artifactDirectory\Rates.Functions.$version.zip"
+# zip functions
+Compress-Archive $functionsPublishDirectory\** "$artifactDirectory\Rates.Functions.$version.zip"
 Test-ExitCode $lastExitCode
+
+# zip front-end
+Compress-Archive "$PSScriptRoot\src\Rates.Functions\wwwroot\**" "$artifactDirectory\Rates.Web.$version.zip"
