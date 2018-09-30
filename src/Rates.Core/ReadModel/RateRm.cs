@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Rates.Core.ReadModel
 {
-    public class RateRm
+    public class RateRm : TableEntity
     {
-        public Guid Id { get; set; }
-        public string Ticker { get; set; }
-        public DateTime Timestamp { get; set; }
+        public const string PartitionKeyLabel = "readmodel";
+
+        public string Ticker => RowKey;
         public double Value { get; set; }
 
         public double? Change1Day { get; set; }
@@ -25,9 +26,7 @@ namespace Rates.Core.ReadModel
         public RateRm() { }
 
         public RateRm(
-            Guid id,
             string ticker,
-            DateTime timestamp,
             double value,
             double? change1Day,
             double? change1Week,
@@ -36,9 +35,8 @@ namespace Rates.Core.ReadModel
             double? change6Months,
             double? change1Year)
         {
-            Id = id;
-            Ticker = ticker;
-            Timestamp = timestamp;
+            PartitionKey = PartitionKeyLabel;
+            RowKey = ticker;
             Value = value;
             Change1Day = change1Day;
             Change1Week = change1Week;

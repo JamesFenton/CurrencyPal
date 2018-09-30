@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.WindowsAzure.Storage.Table;
 using MongoDB.Driver;
 using Rates.Core;
 using Rates.Core.ReadModel;
@@ -35,10 +36,8 @@ namespace Rates.Domain.ReadModel
 
             public Task<Dto> Handle(Query request, CancellationToken cancellationToken)
             {
-                var minimumTime = DateTime.UtcNow.AddHours(-6);
-                var rates = _database.RatesRm.AsQueryable()
-                                             .Where(r => r.Timestamp > minimumTime)
-                                             .ToList();
+                var query = new TableQuery<RateRm>();
+                var rates = _database.RatesRm.ExecuteQuery(query);
 
                 var orderedRates = Constants.FiatTickers
                     .Concat(Constants.MetalsTickers)

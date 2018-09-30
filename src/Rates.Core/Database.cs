@@ -1,6 +1,5 @@
-﻿using MongoDB.Driver;
-using Rates.Core.ReadModel;
-using Rates.Core.WriteModel;
+﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,24 +8,19 @@ namespace Rates.Core
 {
     public class Database
     {
-        private readonly IMongoDatabase _database;
+        private readonly CloudTableClient _client;
 
-        public IMongoCollection<Rate> Rates => _database.GetCollection<Rate>("rates");
+        public CloudTable Rates { get; }
 
-        public IMongoCollection<RateRm> RatesRm => _database.GetCollection<RateRm>("ratesRm");
+        public CloudTable RatesRm { get; }
 
-        public Database(MongoClient client, string database)
+        public Database(string connectionString)
         {
-            _database = client.GetDatabase(database);
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
+            _client = storageAccount.CreateCloudTableClient();
 
-            Rates.Indexes.CreateOne(Builders<Rate>.IndexKeys.Combine(
-                Builders<Rate>.IndexKeys.Ascending(r => r.Ticker),
-                Builders<Rate>.IndexKeys.Ascending(r => r.Timestamp)
-            ));
-
-            RatesRm.Indexes.CreateOne(Builders<RateRm>.IndexKeys.Ascending(
-                    r => r.Ticker
-                ));
+            Rates = _client.GetTableReference("rates");
+            RatesRm = _client.GetTableReference("ratesrm");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.Events;
 using Rates.Core.WriteModel;
@@ -37,7 +38,12 @@ namespace Rates.Domain.WriteModel
             public async Task<IEnumerable<Event>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var rates = await GetRates();
-                await _database.Rates.InsertManyAsync(rates);
+
+                var tasks = rates
+                    .Select(r => TableOperation.InsertOrReplace(r))
+                    .Select(operation => _database.Rates.ExecuteAsync(operation));
+
+                await Task.WhenAll(tasks);
 
                 var events = rates.SelectMany(r => r.GetEvents());
                 return events;
