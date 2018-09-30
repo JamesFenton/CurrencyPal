@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using MediatR;
-using MongoDB.Driver;
 using Rates.Core;
 using Rates.Domain.Services;
 using System;

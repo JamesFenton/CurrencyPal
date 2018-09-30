@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.WindowsAzure.Storage.Table;
-using MongoDB.Driver;
 using Rates.Core;
 using Rates.Core.ReadModel;
 using System;
