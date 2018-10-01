@@ -55,7 +55,7 @@ namespace Rates.Domain.Services
                 var response = await _http.GetStringAsync("https://api.coinmarketcap.com/v1/ticker/" + coinmarketcapTicker);
                 var rateReponse = JArray.Parse(response).First();
                 var rate = rateReponse["price_usd"].Value<double>();
-                return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, rate);
+                return new Rate(ticker, DateTimeOffset.UtcNow, rate);
             }
         }
     }

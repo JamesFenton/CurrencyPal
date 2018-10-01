@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using MediatR;
-using MongoDB.Driver;
 using Rates.Core;
 using Rates.Domain.Services;
 using System;
@@ -30,10 +29,9 @@ namespace Rates.Domain
             return builder;
         }
 
-        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, string databaseConnectionString, string databaseName)
+        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, string databaseConnectionString)
         {
-            builder.RegisterInstance(new MongoClient(databaseConnectionString));
-            builder.Register(c => new Database(c.Resolve<MongoClient>(), databaseName))
+            builder.Register(c => new Database(databaseConnectionString))
                    .SingleInstance();
             builder.RegisterType<HttpClient>()
                    .SingleInstance();

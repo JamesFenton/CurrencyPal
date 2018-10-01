@@ -19,7 +19,7 @@ namespace Rates.Functions
         {
             return new ContainerBuilder()
                 .AddMediator()
-                .AddFetcher(Constants.ConnectionString, Constants.Database)
+                .AddFetcher(Constants.ConnectionString)
                 .Build();
         }
     }

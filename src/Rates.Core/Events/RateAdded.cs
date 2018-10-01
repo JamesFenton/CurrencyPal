@@ -8,16 +8,14 @@ namespace Rates.Core.Events
 {
     public class RateAdded : Event
     {
-        public Guid Id { get; }
         public string Ticker { get; }
-        public DateTime Timestamp { get; }
+        public string TimeKey { get; }
         public double Value { get; }
 
-        public RateAdded(Guid id, string ticker, DateTime timestamp, double value)
+        public RateAdded(string ticker, string timeKey, double value)
         {
-            Id = id;
             Ticker = ticker;
-            Timestamp = timestamp;
+            TimeKey = timeKey;
             Value = value;
         }
     }

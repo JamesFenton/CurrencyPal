@@ -20,7 +20,7 @@ namespace Rates.Functions.BackEnd
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
             
             await mediator.Send(rateAdded);
-            log.Info($"Rate {rateAdded.Ticker} handled successfully");
+            log.Info($"Rate {rateAdded.Ticker} {rateAdded.TimeKey} handled successfully");
         }
     }
 }

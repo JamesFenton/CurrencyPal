@@ -1,7 +1,8 @@
 ﻿using MediatR;
-using MongoDB.Driver;
+using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.ReadModel;
+using Rates.Core.WriteModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,82 +26,50 @@ namespace Rates.Domain.WriteModel
             public Task<Unit> Handle(Core.Events.RateAdded request, CancellationToken cancellationToken)
             {
                 var e = request;
-                var ticker = e.Ticker;
-
-                // add 2 minutes so we don't get a rate from 23 hours ago
-                // since the rate might be saved a few seconds after the hour
-                var now = DateTime.UtcNow.AddMinutes(2);
+                var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
                 // Get historical rates
-                var rate1DayAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddDays(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddDays(-1))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var oneDayAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-1).ToString("o"));
+                var rate1DayAgo = (Rate)_database.Rates.Execute(oneDayAgo).Result;
                 var oneDayChange = GetChangePercent(e.Value, rate1DayAgo?.Value);
 
-                var rate1WeekAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddDays(-7).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddDays(-7))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var oneWeekAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-7).ToString("o"));
+                var rate1WeekAgo = (Rate)_database.Rates.Execute(oneWeekAgo).Result;
                 var oneWeekChange = GetChangePercent(e.Value, rate1WeekAgo?.Value);
 
-                var rate1MonthAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddMonths(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-1))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var oneMonthAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-1).ToString("o"));
+                var rate1MonthAgo = (Rate)_database.Rates.Execute(oneMonthAgo).Result;
                 var oneMonthChange = GetChangePercent(e.Value, rate1MonthAgo?.Value);
 
-                var rate3MonthsAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddMonths(-3).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-3))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var threeMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-3).ToString("o"));
+                var rate3MonthsAgo = (Rate)_database.Rates.Execute(threeMonthsAgo).Result;
                 var threeMonthChange = GetChangePercent(e.Value, rate3MonthsAgo?.Value);
 
-                var rate6MonthsAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddMonths(-6).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddMonths(-6))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var sixMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-6).ToString("o"));
+                var rate6MonthsAgo = (Rate)_database.Rates.Execute(sixMonthsAgo).Result;
                 var sixMonthChange = GetChangePercent(e.Value, rate6MonthsAgo?.Value);
 
-                var rate1YearAgo = _database.Rates
-                    .AsQueryable()
-                    .Where(r => r.Ticker == ticker && now.AddYears(-1).AddHours(-1) <= r.Timestamp && r.Timestamp <= now.AddYears(-1))
-                    .OrderByDescending(r => r.Timestamp)
-                    .FirstOrDefault();
+                var oneYearAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddYears(-1).ToString("o"));
+                var rate1YearAgo = (Rate)_database.Rates.Execute(oneYearAgo).Result;
                 var oneYearChange = GetChangePercent(e.Value, rate1YearAgo?.Value);
 
                 // fetch existing rate and create an updated version
-                var existing = _database.RatesRm
-                    .AsQueryable()
-                    .FirstOrDefault(r => r.Ticker == e.Ticker);
+                var fetchExistingOperation = TableOperation.Retrieve<RateRm>(RateRm.PartitionKeyLabel, request.Ticker);
+                var existing = (RateRm)_database.RatesRm.Execute(fetchExistingOperation).Result;
+
 
                 var updatedRate = new RateRm(
-                        id: existing?.Id ?? Guid.NewGuid(),
-                        ticker: e.Ticker,
-                        timestamp: e.Timestamp,
-                        value: e.Value,
-                        change1Day: oneDayChange,
-                        change1Week: oneWeekChange,
-                        change1Month: oneMonthChange,
-                        change3Months: threeMonthChange,
-                        change6Months: sixMonthChange,
-                        change1Year: oneYearChange);
+                    ticker: e.Ticker,
+                    value: e.Value,
+                    change1Day: oneDayChange,
+                    change1Week: oneWeekChange,
+                    change1Month: oneMonthChange,
+                    change3Months: threeMonthChange,
+                    change6Months: sixMonthChange,
+                    change1Year: oneYearChange);
 
-                if (existing == null)
-                {
-                    _database.RatesRm.InsertOne(updatedRate);
-                }
-                else
-                {
-                    _database.RatesRm.ReplaceOne(
-                        Builders<RateRm>.Filter.Eq(r => r.Id, existing.Id),
-                        updatedRate);
-                }
+                var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
+                _database.RatesRm.Execute(insertOrReplaceOperation);
 
                 return Unit.Task;
             }

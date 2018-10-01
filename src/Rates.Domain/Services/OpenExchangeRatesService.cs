@@ -36,7 +36,7 @@ namespace Rates.Domain.Services
                 var sourceRate = sourceRates[source].Value<double>();
                 var destRate = sourceRates[dest].Value<double>();
                 var crossRate = destRate / sourceRate;
-                return new Rate(Guid.NewGuid(), ticker, DateTime.UtcNow, crossRate);
+                return new Rate(ticker, DateTimeOffset.UtcNow, crossRate);
             }
         }
     }
