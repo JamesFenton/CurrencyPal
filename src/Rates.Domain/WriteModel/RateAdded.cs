@@ -23,41 +23,47 @@ namespace Rates.Domain.WriteModel
                 _database = database;
             }
 
-            public Task<Unit> Handle(Core.Events.RateAdded request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(Core.Events.RateAdded request, CancellationToken cancellationToken)
             {
                 var e = request;
                 var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
-                // Get historical rates
+                // Get historical rates table operations
                 var oneDayAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-1).ToString("o"));
-                var rate1DayAgo = (Rate)_database.Rates.Execute(oneDayAgo).Result;
-                var oneDayChange = GetChangePercent(e.Value, rate1DayAgo?.Value);
-
                 var oneWeekAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-7).ToString("o"));
-                var rate1WeekAgo = (Rate)_database.Rates.Execute(oneWeekAgo).Result;
-                var oneWeekChange = GetChangePercent(e.Value, rate1WeekAgo?.Value);
-
                 var oneMonthAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-1).ToString("o"));
-                var rate1MonthAgo = (Rate)_database.Rates.Execute(oneMonthAgo).Result;
-                var oneMonthChange = GetChangePercent(e.Value, rate1MonthAgo?.Value);
-
                 var threeMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-3).ToString("o"));
-                var rate3MonthsAgo = (Rate)_database.Rates.Execute(threeMonthsAgo).Result;
-                var threeMonthChange = GetChangePercent(e.Value, rate3MonthsAgo?.Value);
-
                 var sixMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-6).ToString("o"));
-                var rate6MonthsAgo = (Rate)_database.Rates.Execute(sixMonthsAgo).Result;
-                var sixMonthChange = GetChangePercent(e.Value, rate6MonthsAgo?.Value);
-
                 var oneYearAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddYears(-1).ToString("o"));
-                var rate1YearAgo = (Rate)_database.Rates.Execute(oneYearAgo).Result;
-                var oneYearChange = GetChangePercent(e.Value, rate1YearAgo?.Value);
 
-                // fetch existing rate and create an updated version
-                var fetchExistingOperation = TableOperation.Retrieve<RateRm>(RateRm.PartitionKeyLabel, request.Ticker);
-                var existing = (RateRm)_database.RatesRm.Execute(fetchExistingOperation).Result;
+                // execute all the operations in parallel
+                var tasks = new[]
+                {
+                    oneDayAgo,
+                    oneWeekAgo,
+                    oneMonthAgo,
+                    threeMonthsAgo,
+                    sixMonthsAgo,
+                    oneMonthAgo,
+                }
+                .Select(operation => _database.Rates.ExecuteAsync(operation));
 
+                // wait for all operations to complete
+                await Task.WhenAll(tasks);
 
+                // get the rates from the operation results
+                var rates = tasks.Select(t => t.Result)
+                    .Select(tableResult => (Rate)tableResult.Result)
+                    .ToArray();
+
+                var oneDayChange = GetChangePercent(e.Value, rates[0]?.Value);
+                var oneWeekChange = GetChangePercent(e.Value, rates[1]?.Value);
+                var oneMonthChange = GetChangePercent(e.Value, rates[2]?.Value);
+                var threeMonthChange = GetChangePercent(e.Value, rates[3]?.Value);
+                var sixMonthChange = GetChangePercent(e.Value, rates[4]?.Value);
+                var oneYearChange = GetChangePercent(e.Value, rates[5]?.Value);
+
+                // Update the read model entry
                 var updatedRate = new RateRm(
                     ticker: e.Ticker,
                     value: e.Value,
@@ -69,9 +75,9 @@ namespace Rates.Domain.WriteModel
                     change1Year: oneYearChange);
 
                 var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
-                _database.RatesRm.Execute(insertOrReplaceOperation);
+                await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
 
-                return Unit.Task;
+                return Unit.Value;
             }
 
             private double? GetChangePercent(double rateNow, double? rateThen)

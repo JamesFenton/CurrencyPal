@@ -6,7 +6,7 @@ using Autofac;
 using MediatR;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 
 namespace Rates.Functions.FrontEnd
 {
@@ -14,8 +14,8 @@ namespace Rates.Functions.FrontEnd
     {
         [FunctionName("GetRates")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequestMessage req, 
-            TraceWriter log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequestMessage req,
+            ILogger log)
         {
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
             
