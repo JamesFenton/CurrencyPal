@@ -28,40 +28,12 @@ namespace Rates.Domain.WriteModel
                 var e = request;
                 var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
-                // Get historical rates table operations
-                var oneDayAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-1).ToString("o"));
-                var oneWeekAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddDays(-7).ToString("o"));
-                var oneMonthAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-1).ToString("o"));
-                var threeMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-3).ToString("o"));
-                var sixMonthsAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddMonths(-6).ToString("o"));
-                var oneYearAgo = TableOperation.Retrieve<Rate>(request.Ticker, timeAdded.AddYears(-1).ToString("o"));
-
-                // execute all the operations in parallel
-                var tasks = new[]
-                {
-                    oneDayAgo,
-                    oneWeekAgo,
-                    oneMonthAgo,
-                    threeMonthsAgo,
-                    sixMonthsAgo,
-                    oneMonthAgo,
-                }
-                .Select(operation => _database.Rates.ExecuteAsync(operation));
-
-                // wait for all operations to complete
-                await Task.WhenAll(tasks);
-
-                // get the rates from the operation results
-                var rates = tasks.Select(t => t.Result)
-                    .Select(tableResult => (Rate)tableResult.Result)
-                    .ToArray();
-
-                var oneDayChange = GetChangePercent(e.Value, rates[0]?.Value);
-                var oneWeekChange = GetChangePercent(e.Value, rates[1]?.Value);
-                var oneMonthChange = GetChangePercent(e.Value, rates[2]?.Value);
-                var threeMonthChange = GetChangePercent(e.Value, rates[3]?.Value);
-                var sixMonthChange = GetChangePercent(e.Value, rates[4]?.Value);
-                var oneYearChange = GetChangePercent(e.Value, rates[5]?.Value);
+                var oneDayChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
+                var oneWeekChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
+                var oneMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
+                var threeMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
+                var sixMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
+                var oneYearChange = await GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
 
                 // Update the read model entry
                 var updatedRate = new RateRm(
@@ -78,6 +50,15 @@ namespace Rates.Domain.WriteModel
                 await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
 
                 return Unit.Value;
+            }
+
+            private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
+            {
+                var operation = TableOperation.Retrieve<Rate>(ticker, time.ToString("o"));
+                var tableResult = await _database.Rates.ExecuteAsync(operation);
+                var rate = (Rate)tableResult.Result;
+                var rateThen = rate?.Value;
+                return GetChangePercent(rateNow, rateThen);
             }
 
             private double? GetChangePercent(double rateNow, double? rateThen)
