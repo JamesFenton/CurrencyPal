@@ -33,10 +33,12 @@ namespace Rates.Domain.ReadModel
                 _database = database;
             }
 
-            public Task<Dto> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Dto> Handle(Query request, CancellationToken cancellationToken)
             {
                 var query = new TableQuery<RateRm>();
-                var rates = _database.RatesRm.ExecuteQuery(query);
+
+                TableContinuationToken continuationToken = null;
+                var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
                 var orderedRates = Constants.FiatTickers
                     .Concat(Constants.MetalsTickers)
@@ -45,11 +47,11 @@ namespace Rates.Domain.ReadModel
                     .Where(r => r != null)
                     .ToList();
 
-                return Task.FromResult(new Dto
+                return new Dto
                 {
                     Rates = orderedRates,
-                    UpdateTime = ((DateTimeOffset)orderedRates.Min(r => r.Timestamp)).ToUnixTimeMilliseconds()
-                });
+                    UpdateTime = orderedRates.Min(r => r.Timestamp).ToUnixTimeMilliseconds()
+                };
             }
         }
     }

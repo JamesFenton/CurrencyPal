@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using MediatR;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Rates.Functions.BackEnd
@@ -16,13 +16,13 @@ namespace Rates.Functions.BackEnd
         public static async Task Run(
             [TimerTrigger("0 0 * * * *")]TimerInfo myTimer,
             [Queue(Lookups.RatesAddedQueue)] ICollector<string> destinationQueue,
-            TraceWriter log)
+            ILogger log)
         {
             var mediator = ContainerFactory.Container.Resolve<IMediator>();
 
             var events = await mediator.Send(new Domain.WriteModel.FetchRates.Command());
             
-            log.Info($"Sending {events.Count()} events to {Lookups.RatesAddedQueue} queue");
+            log.LogInformation($"Sending {events.Count()} events to {Lookups.RatesAddedQueue} queue");
             foreach (var @event in events)
             {
                 var json = JsonConvert.SerializeObject(@event, Lookups.JsonSettings);

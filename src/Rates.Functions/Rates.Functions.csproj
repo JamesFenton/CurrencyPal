@@ -1,31 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <AzureFunctionsVersion>v1</AzureFunctionsVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
+  
   <ItemGroup>
-    <None Remove="wwwroot\app.js" />
-    <None Remove="wwwroot\index.html" />
-    <None Remove="wwwroot\site.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="wwwroot\app.js">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="wwwroot\index.html">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="wwwroot\site.css">
+    <Content Include="wwwroot\**">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.7.2" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.14" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
   </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -35,10 +29,13 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Rates.Domain\Rates.Domain.csproj" />
   </ItemGroup>
+  
 </Project>
