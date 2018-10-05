@@ -39,11 +39,11 @@ namespace Rates.Domain.WriteModel
             {
                 var rates = await GetRates();
 
-                var tasks = rates
-                    .Select(r => TableOperation.InsertOrReplace(r))
-                    .Select(operation => _database.Rates.ExecuteAsync(operation));
-
-                await Task.WhenAll(tasks);
+                foreach(var rate in rates)
+                {
+                    var operation = TableOperation.InsertOrReplace(rate);
+                    await _database.Rates.ExecuteAsync(operation);
+                }
 
                 var events = rates.SelectMany(r => r.GetEvents());
                 return events;
