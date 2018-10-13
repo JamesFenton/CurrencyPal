@@ -49,7 +49,7 @@ $username = $creds.Properties.PublishingUserName
 $password = $creds.Properties.PublishingPassword
 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username,$password)))
 $apiUrl = "https://$functionAppName.scm.azurewebsites.net/api/zip/site/wwwroot"
-$filePath = (Get-Item "Rates.Functions.*.zip").FullName
+$filePath = (Get-Item "$PSScriptRoot\Rates.Functions.*.zip").FullName
 $userAgent = "powershell/1.0"
 Write-Host "Deploying $filePath"
 Invoke-RestMethod -Uri $apiUrl `
