@@ -6,7 +6,8 @@ namespace Rates.Core
 {
     public static class Constants
     {
-        public static string ConnectionString => Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING");
+        public static string DatabaseConnectionString => Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING");
+        public static string DatabaseAccessKey => Environment.GetEnvironmentVariable("RATES_DB_ACCESSKEY");
         public static string OpenExchangeRatesAppId => Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID");
 
         public static readonly string[] FiatTickers = { "USDZAR", "GBPZAR", "EURZAR", "ZARMUR" };

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.Events;
 using Rates.Core.WriteModel;
@@ -41,8 +40,7 @@ namespace Rates.Domain.WriteModel
 
                 foreach(var rate in rates)
                 {
-                    var operation = TableOperation.InsertOrReplace(rate);
-                    await _database.Rates.ExecuteAsync(operation);
+                    await _database.Client.UpsertDocumentAsync(_database.RatesUri, rate);
                 }
 
                 var events = rates.SelectMany(r => r.GetEvents());
@@ -58,9 +56,9 @@ namespace Rates.Domain.WriteModel
                     _coinMarketCapService.GetCryptoCurrencies(Constants.CryptoTickers),
                 };
 
-                await Task.WhenAll(tasks);
+                var results = await Task.WhenAll(tasks);
 
-                var rates = tasks.SelectMany(t => t.Result).ToList();
+                var rates = results.SelectMany(t => t).ToList();
 
                 return rates;
             }

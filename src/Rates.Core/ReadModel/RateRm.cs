@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Rates.Core.ReadModel
 {
-    public class RateRm : TableEntity
+    public class RateRm : CosmosModel
     {
-        public const string PartitionKeyLabel = "readmodel";
-
-        public string Ticker => RowKey;
+        public string Ticker { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
         public double Value { get; set; }
 
         public double? Change1Day { get; set; }
@@ -21,6 +19,7 @@ namespace Rates.Core.ReadModel
         public double? Change6Months { get; set; }
         public double? Change1Year { get; set; }
 
+        // used by the front-end
         public bool OutOfDate => Timestamp < DateTimeOffset.UtcNow.AddHours(-1);
 
         public RateRm() { }
@@ -35,8 +34,9 @@ namespace Rates.Core.ReadModel
             double? change6Months,
             double? change1Year)
         {
-            PartitionKey = PartitionKeyLabel;
-            RowKey = ticker;
+            Id = ticker.ToString();
+            Ticker = ticker;
+            Timestamp = DateTimeOffset.UtcNow;
             Value = value;
             Change1Day = change1Day;
             Change1Week = change1Week;
