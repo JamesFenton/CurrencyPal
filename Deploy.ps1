@@ -12,7 +12,7 @@ function Replace-Text($filePath, $replacementToken, $value) {
 }
 
 function Get-Properties($file) {
-	$extension = [Path]::[GetExtension]($file)
+	$extension = [System.IO.Path]::[GetExtension]($file)
 	if ($extension -eq ".html") {
 		return @{ContentType = "text/html"}
 	}
