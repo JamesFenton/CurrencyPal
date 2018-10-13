@@ -60,7 +60,7 @@ namespace Rates.Domain.WriteModel
                 {
                     var id = Rate.CreateId(ticker, time.ToString("o"));
                     var uri = UriFactory.CreateDocumentUri(_database.DatabaseName, _database.RatesCollection, id);
-                    var response = await _database.Client.ReadDocumentAsync<Rate>(_database.RatesUri);
+                    var response = await _database.Client.ReadDocumentAsync<Rate>(uri);
                     rate = response.Document;
                 }
                 catch (DocumentClientException e)
