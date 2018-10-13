@@ -12,18 +12,31 @@ namespace Rates.Domain.ReadModel
 {
     public class GetRates
     {
-        public class Dto
+        public class RateDto
         {
-            public List<RateRm> Rates { get; set; }
+            public string Ticker { get; set; }
+            public DateTimeOffset Timestamp { get; set; }
+            public double Value { get; set; }
+            public double? Change1Day { get; set; }
+            public double? Change1Week { get; set; }
+            public double? Change1Month { get; set; }
+            public double? Change3Months { get; set; }
+            public double? Change6Months { get; set; }
+            public double? Change1Year { get; set; }
+            public bool OutOfDate => Timestamp < DateTimeOffset.UtcNow.AddHours(-1);
+        }
+
+        public class Response
+        {
+            public IEnumerable<RateDto> Rates { get; set; }
             public long UpdateTime { get; set; }
         }
 
-        public class Query : IRequest<Dto>
+        public class Query : IRequest<Response>
         {
-
         }
 
-        public class Handler : IRequestHandler<Query, Dto>
+        public class Handler : IRequestHandler<Query, Response>
         {
             private readonly Database _database;
 
@@ -32,7 +45,7 @@ namespace Rates.Domain.ReadModel
                 _database = database;
             }
 
-            public async Task<Dto> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
             {                
                 var rates = _database.Client.CreateDocumentQuery<RateRm>(_database.RatesRmUri).ToList();
 
@@ -43,10 +56,24 @@ namespace Rates.Domain.ReadModel
                     .Where(r => r != null)
                     .ToList();
 
-                return new Dto
+                var rateDtos = orderedRates.Select(r => new RateDto
                 {
-                    Rates = orderedRates,
-                    UpdateTime = orderedRates.Min(r => r.Timestamp).ToUnixTimeMilliseconds()
+                    Ticker = r.Ticker,
+                    Timestamp = r.Timestamp,
+                    Value = r.Value,
+                    Change1Day = r.Change1Day,
+                    Change1Week = r.Change1Week,
+                    Change1Month = r.Change1Month,
+                    Change3Months = r.Change3Months,
+                    Change6Months = r.Change6Months,
+                    Change1Year = r.Change1Year,
+                });
+                var updateTime = rateDtos.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
+
+                return new Response
+                {
+                    Rates = rateDtos,
+                    UpdateTime = updateTime
                 };
             }
         }

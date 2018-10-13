@@ -19,9 +19,6 @@ namespace Rates.Core.ReadModel
         public double? Change6Months { get; set; }
         public double? Change1Year { get; set; }
 
-        // used by the front-end
-        public bool OutOfDate => Timestamp < DateTimeOffset.UtcNow.AddHours(-1);
-
         public RateRm() { }
 
         public RateRm(
