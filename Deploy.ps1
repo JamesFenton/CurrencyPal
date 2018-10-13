@@ -12,8 +12,8 @@ function Replace-Text($filePath, $replacementToken, $value) {
 }
 
 function Get-Properties($file) {
-	var extension = [Path]::[GetExtension]($file)
-	if (extension -eq ".html") {
+	$extension = [Path]::[GetExtension]($file)
+	if ($extension -eq ".html") {
 		return @{ContentType = "text/html"}
 	}
 	return @{}
