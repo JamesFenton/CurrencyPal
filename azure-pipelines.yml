@@ -12,7 +12,7 @@ variables:
 name: $(version).$(Build.BuildId)
 
 steps:
-- powershell: .\Build.ps1 -buildVersion $(version) -buildCounter $(Build.BuildId) -applicationInsightsKey $(applicationInsightsKey)
+- powershell: .\Build.ps1 -buildVersion $(version) -buildCounter $(Build.BuildId)
   displayName: Build.ps1
 
 - task: PublishBuildArtifacts@1

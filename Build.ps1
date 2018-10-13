@@ -1,8 +1,7 @@
 param(
 	$buildVersion = "0.0.1",
 	$buildCounter = 0,
-	$artifactDirectory = "$PSScriptRoot\artifacts",
-	$applicationInsightsKey = $null
+	$artifactDirectory = "$PSScriptRoot\artifacts"
 )
 
 function Test-ExitCode($exitCode) {
@@ -11,17 +10,8 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
-function Replace-Text($filePath, $replacementToken, $value) {
-	$file = (Get-Content $filePath) -join "`n"
-	$file.Replace($replacementToken, $value) | Out-File $filePath
-}
-
 $version = "$buildVersion.$buildCounter"
 $functionsPublishDirectory = "$PSScriptRoot\publish\Rates.Functions"
-
-if ($applicationInsightsKey -ne $null) {
-	Replace-Text "$PSScriptRoot\src\Rates.Functions\wwwroot\index.html" "<insert instrumentation key>" $applicationInsightsKey
-}
 
 # publish web
 dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $functionsPublishDirectory -c Release

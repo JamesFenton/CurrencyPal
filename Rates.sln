@@ -5,7 +5,6 @@ VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEE5D946-5A46-41A5-826F-7288663978DB}"
 	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
 		azure-pipelines.yml = azure-pipelines.yml
 		Build.ps1 = Build.ps1
 		Deploy.ps1 = Deploy.ps1
