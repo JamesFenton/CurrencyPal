@@ -11,9 +11,9 @@ function Test-ExitCode($exitCode) {
 	}
 }
 
-function Replace-Text($file, $replacementToken, $value) {
-	$file = (Get-Content $file) -join "`n"
-	$file.Replace($replacementToken, $value) | Out-File $file
+function Replace-Text($filePath, $replacementToken, $value) {
+	$file = (Get-Content $filePath) -join "`n"
+	$file.Replace($replacementToken, $value) | Out-File $filePath
 }
 
 $version = "$buildVersion.$buildCounter"
