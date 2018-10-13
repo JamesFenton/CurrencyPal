@@ -28,7 +28,7 @@ namespace Rates.Domain.ReadModel
 
         public class Response
         {
-            public IEnumerable<RateDto> Rates { get; set; }
+            public List<RateDto> Rates { get; set; }
             public long UpdateTime { get; set; }
         }
 
@@ -67,7 +67,7 @@ namespace Rates.Domain.ReadModel
                     Change3Months = r.Change3Months,
                     Change6Months = r.Change6Months,
                     Change1Year = r.Change1Year,
-                });
+                }).ToList();
                 var updateTime = rateDtos.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
 
                 return new Response
