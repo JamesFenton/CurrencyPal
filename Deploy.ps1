@@ -1,6 +1,7 @@
 param(
 	$websiteFolder = "$PSScriptRoot\Rates.Web",
-	$storageAccountResourceGroup = "rates",
+	$resourceGroup = "rates",
+	$functionAppName = "ratesfenton"
 	$storageAccount = "ratesfenton",
 	$storageAccountContainer = "`$web",
 	$applicationInsightsKey = $null
@@ -26,8 +27,7 @@ if ($applicationInsightsKey -ne $null) {
 }
 
 # Upload static files to storage
-Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup -AccountName $storageAccount
-
+Set-AzureRmCurrentStorageAccount -ResourceGroupName $resourceGroup -AccountName $storageAccount
 $files = Get-ChildItem $websiteFolder -File -Recurse
 Write-Host "Uploading $($files.Count) to $storageAccountContainer"
 foreach($file in $files) {
@@ -39,3 +39,22 @@ foreach($file in $files) {
 		-Properties $properties `
 		-Force
 }
+
+# Deploy functions app
+$creds = Invoke-AzureRmResourceAction -ResourceGroupName $resourceGroup `
+	-ResourceType Microsoft.Web/sites/config `
+    -ResourceName $functionAppName/publishingcredentials `
+	-Action list -ApiVersion 2015-08-01 -Force
+$username = $creds.Properties.PublishingUserName
+$password = $creds.Properties.PublishingPassword
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username,$password)))
+$apiUrl = "https://$functionAppName.scm.azurewebsites.net/api/zip/site/wwwroot"
+$filePath = (Get-Item "Rates.Functions.*.zip").FullName
+$userAgent = "powershell/1.0"
+Write-Host "Deploying $filePath"
+Invoke-RestMethod -Uri $apiUrl `
+	-Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} `
+	-UserAgent $userAgent `
+	-Method POST `
+	-InFile $filePath `
+	-ContentType "multipart/form-data"
