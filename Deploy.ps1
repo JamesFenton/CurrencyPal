@@ -10,4 +10,4 @@ Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup
 
 $files = Get-ChildItem $websiteFolder -File -Recurse
 Write-Host "Uploading $($files.Count) to $storageAccountContainer"
-$files | Set-AzureStorageBlobContent -Container $storageAccountContainer
+$files | Set-AzureStorageBlobContent -Container $storageAccountContainer -Force
