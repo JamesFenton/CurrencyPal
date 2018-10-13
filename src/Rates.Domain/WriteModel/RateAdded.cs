@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Rates.Core;
 using Rates.Core.ReadModel;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Database = Rates.Core.Database;
 
 namespace Rates.Domain.WriteModel
 {
@@ -53,10 +55,22 @@ namespace Rates.Domain.WriteModel
 
             private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
             {
-                var rate = _database.Client.CreateDocumentQuery<Rate>(_database.RatesUri)
-                    .Where(r => r.Ticker == ticker && r.TimeKey == time.ToString("o"))
-                    .AsEnumerable()
-                    .FirstOrDefault();
+                Rate rate = null;
+                try
+                {
+                    var id = Rate.CreateId(ticker, time.ToString("o"));
+                    var uri = UriFactory.CreateDocumentUri(_database.DatabaseName, _database.RatesCollection, id);
+                    var response = await _database.Client.ReadDocumentAsync<Rate>(_database.RatesUri);
+                    rate = response.Document;
+                }
+                catch (DocumentClientException e)
+                {
+                    if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                        return null;
+                    else
+                        throw;
+                }
+
                 var rateThen = rate?.Value;
                 return GetChangePercent(rateNow, rateThen);
             }

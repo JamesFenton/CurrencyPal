@@ -45,7 +45,7 @@ namespace Rates.Domain.ReadModel
                 _database = database;
             }
 
-            public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
+            public Task<Response> Handle(Query request, CancellationToken cancellationToken)
             {                
                 var rates = _database.Client.CreateDocumentQuery<RateRm>(_database.RatesRmUri).ToList();
 
@@ -70,11 +70,11 @@ namespace Rates.Domain.ReadModel
                 }).ToList();
                 var updateTime = rateDtos.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
 
-                return new Response
+                return Task.FromResult(new Response
                 {
                     Rates = rateDtos,
                     UpdateTime = updateTime
-                };
+                });
             }
         }
     }

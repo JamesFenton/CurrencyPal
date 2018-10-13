@@ -25,8 +25,8 @@ var app = new Vue({
                 })
                 .catch(error => {
                     var response = error.response.data;
+                    this.requesting = false;
 
-                    this.requesting = false
                     this.errorMessage = response.message;
                 });
         }
@@ -38,14 +38,14 @@ var app = new Vue({
     },
     filters: {
         round: function (value) {
-            if (value == null) 
+            if (value === null) 
                 return '';
             if (value < 1)
                 return value.toFixed(4);
             return value.toFixed(2);
         },
         roundedPercentage: function (value) {
-            if (value == null)
+            if (value === null)
                 return '';
             var rounded = value.toFixed(2) + '%';
             return rounded;
