@@ -8,7 +8,9 @@ param(
 
 function Replace-Text($filePath, $replacementToken, $value) {
 	$file = (Get-Content $filePath) -join "`n"
-	$file.Replace($replacementToken, $value) | Out-File $filePath
+	if ($file.Contains($replacementToken)) {
+		$file.Replace($replacementToken, $value) | Out-File $filePath
+	}
 }
 
 function Get-Properties($file) {
