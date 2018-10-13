@@ -19,5 +19,6 @@ if ($applicationInsightsKey -ne $null) {
 Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup -AccountName $storageAccount
 
 $files = Get-ChildItem $websiteFolder -File -Recurse
+$properties = @{ContentType = "text/html"}
 Write-Host "Uploading $($files.Count) to $storageAccountContainer"
-$files | Set-AzureStorageBlobContent -Container $storageAccountContainer -Force
+$files | Set-AzureStorageBlobContent -Container $storageAccountContainer -Properties $properties -Force
