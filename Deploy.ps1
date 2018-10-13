@@ -3,6 +3,7 @@ param(
 	$storageAccountResourceGroup = "rates",
 	$storageAccount = "ratesfenton",
 	$storageAccountContainer = "`$web"
+)
 
 # Upload static files to storage
 Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup -AccountName $storageAccount
