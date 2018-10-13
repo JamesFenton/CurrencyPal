@@ -12,7 +12,7 @@ function Test-ExitCode($exitCode) {
 }
 
 function Replace-Text($file, $replacementToken, $value) {
-	$file = Get-Content $file -join "`n"
+	$file = (Get-Content $file) -join "`n"
 	$file.Replace($replacementToken, $value) | Out-File $file
 }
 
