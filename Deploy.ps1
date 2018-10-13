@@ -1,7 +1,7 @@
 param(
 	$websiteFolder = "$PSScriptRoot\Rates.Web",
 	$resourceGroup = "rates",
-	$functionAppName = "ratesfenton"
+	$functionAppName = "ratesfenton",
 	$storageAccount = "ratesfenton",
 	$storageAccountContainer = "`$web",
 	$applicationInsightsKey = $null
