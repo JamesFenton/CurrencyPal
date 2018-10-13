@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.ReadModel;
 using System;
@@ -34,11 +33,8 @@ namespace Rates.Domain.ReadModel
             }
 
             public async Task<Dto> Handle(Query request, CancellationToken cancellationToken)
-            {
-                var query = new TableQuery<RateRm>();
-
-                TableContinuationToken continuationToken = null;
-                var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
+            {                
+                var rates = _database.Client.CreateDocumentQuery<RateRm>(_database.RatesRmUri).ToList();
 
                 var orderedRates = Constants.FiatTickers
                     .Concat(Constants.MetalsTickers)

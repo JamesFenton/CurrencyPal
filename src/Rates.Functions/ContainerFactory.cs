@@ -17,10 +17,15 @@ namespace Rates.Functions
 
         private static IContainer GetContainer()
         {
-            return new ContainerBuilder()
+            var container = new ContainerBuilder()
                 .AddMediator()
-                .AddFetcher(Constants.ConnectionString)
+                .AddFetcher(Constants.DatabaseConnectionString, Constants.DatabaseAccessKey)
                 .Build();
+
+            var database = container.Resolve<Database>();
+            database.Initialise().GetAwaiter().GetResult();
+
+            return container;
         }
     }
 }

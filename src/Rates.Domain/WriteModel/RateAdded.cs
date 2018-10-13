@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Documents.Client;
 using Rates.Core;
 using Rates.Core.ReadModel;
 using Rates.Core.WriteModel;
@@ -45,18 +45,18 @@ namespace Rates.Domain.WriteModel
                     change3Months: threeMonthChange,
                     change6Months: sixMonthChange,
                     change1Year: oneYearChange);
-
-                var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
-                await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
+                
+                await _database.Client.UpsertDocumentAsync(_database.RatesRmUri, updatedRate);
 
                 return Unit.Value;
             }
 
             private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
             {
-                var operation = TableOperation.Retrieve<Rate>(ticker, time.ToString("o"));
-                var tableResult = await _database.Rates.ExecuteAsync(operation);
-                var rate = (Rate)tableResult.Result;
+                var rate = _database.Client.CreateDocumentQuery<Rate>(_database.RatesUri)
+                    .Where(r => r.Ticker == ticker && r.TimeKey == time.ToString("o"))
+                    .AsEnumerable()
+                    .FirstOrDefault();
                 var rateThen = rate?.Value;
                 return GetChangePercent(rateNow, rateThen);
             }
