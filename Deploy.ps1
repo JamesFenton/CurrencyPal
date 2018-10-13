@@ -29,7 +29,7 @@ Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup
 $files = Get-ChildItem $websiteFolder -File -Recurse
 Write-Host "Uploading $($files.Count) to $storageAccountContainer"
 foreach($file in $files) {
-	$properties = Get-Properties $file
+	$properties = Get-Properties $($file.FullName)
 	Set-AzureStorageBlobContent `
 		-Container $storageAccountContainer `
 		-File $file `
