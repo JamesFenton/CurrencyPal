@@ -11,6 +11,14 @@ function Replace-Text($filePath, $replacementToken, $value) {
 	$file.Replace($replacementToken, $value) | Out-File $filePath
 }
 
+function Get-Properties($file) {
+	var extension = [Path]::[GetExtension]($file)
+	if (extension -eq ".html") {
+		return @{ContentType = "text/html"}
+	}
+	return @{}
+}
+
 if ($applicationInsightsKey -ne $null) {
 	Replace-Text "$websiteFolder\index.html" "<insert instrumentation key>" $applicationInsightsKey
 }
@@ -21,4 +29,7 @@ Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup
 $files = Get-ChildItem $websiteFolder -File -Recurse
 $properties = @{ContentType = "text/html"}
 Write-Host "Uploading $($files.Count) to $storageAccountContainer"
-$files | Set-AzureStorageBlobContent -Container $storageAccountContainer -Properties $properties -Force
+$files | Set-AzureStorageBlobContent `
+	-Container $storageAccountContainer `
+	-Properties Get-Properties($_) `
+	-Force
