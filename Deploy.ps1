@@ -1,7 +1,12 @@
 param(
-	$websiteFolder = "$PSScriptRoot\Rates.Web"
-)
+	$websiteFolder = "$PSScriptRoot\Rates.Web",
+	$storageAccountResourceGroup = "rates",
+	$storageAccount = "ratesfenton",
+	$storageAccountContainer = "`$web"
 
 # Upload static files to storage
-Set-AzureRmCurrentStorageAccount -ResourceGroupName "rates" -AccountName "ratesfenton"
-Get-ChildItem $websiteFolder -File -Recurse | Set-AzureStorageBlobContent -Container "`$web"
+Set-AzureRmCurrentStorageAccount -ResourceGroupName $storageAccountResourceGroup -AccountName $storageAccount
+
+$files = Get-ChildItem $websiteFolder -File -Recurse
+Write-Host "Uploading $($files.Count) to $storageAccountContainer"
+$files | Set-AzureStorageBlobContent -Container $storageAccountContainer
