@@ -30,12 +30,12 @@ namespace Rates.Domain.WriteModel
                 var e = request;
                 var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
-                var oneDayChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
-                var oneWeekChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
-                var oneMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
-                var threeMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
-                var sixMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
-                var oneYearChange = await GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
+                var oneDayChange = GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
+                var oneWeekChange = GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
+                var oneMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
+                var threeMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
+                var sixMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
+                var oneYearChange = GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
 
                 // Update the read model entry
                 var updatedRate = new RateRm(
@@ -53,23 +53,13 @@ namespace Rates.Domain.WriteModel
                 return Unit.Value;
             }
 
-            private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
+            private double? GetRateChange(string ticker, DateTimeOffset time, double rateNow)
             {
-                Rate rate = null;
-                try
-                {
-                    var id = Rate.CreateId(ticker, time.ToString("o"));
-                    var uri = UriFactory.CreateDocumentUri(_database.DatabaseName, _database.RatesCollection, id);
-                    var response = await _database.Client.ReadDocumentAsync<Rate>(uri);
-                    rate = response.Document;
-                }
-                catch (DocumentClientException e)
-                {
-                    if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return null;
-                    else
-                        throw;
-                }
+                var id = Rate.CreateId(ticker, time.ToString("o"));
+                var rate = _database.Client.CreateDocumentQuery<Rate>(_database.RatesUri)
+                    .Where(r => r.Id == id)
+                    .AsEnumerable()
+                    .FirstOrDefault();
 
                 var rateThen = rate?.Value;
                 return GetChangePercent(rateNow, rateThen);
