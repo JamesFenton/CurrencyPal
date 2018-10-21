@@ -19,7 +19,9 @@ namespace Rates.Functions
         {
             var container = new ContainerBuilder()
                 .AddMediator()
-                .AddFetcher(Constants.DatabaseConnectionString)
+                .AddFetcher(databaseConnectionString: Constants.DatabaseConnectionString,
+                            coinMarketCapApiKey: Constants.CoinMarketCapApiKey,
+                            openExchangeRatesAppId: Constants.OpenExchangeRatesAppId)
                 .Build();
 
             return container;

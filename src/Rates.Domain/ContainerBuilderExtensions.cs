@@ -5,7 +5,6 @@ using Rates.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,16 +28,17 @@ namespace Rates.Domain
             return builder;
         }
 
-        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, string databaseConnectionString)
+        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, 
+            string databaseConnectionString,
+            string coinMarketCapApiKey,
+            string openExchangeRatesAppId)
         {
             builder.Register(c => new Database(databaseConnectionString))
                    .SingleInstance();
-            builder.RegisterType<HttpClient>()
+            builder.Register(c => new CoinMarketCapService(coinMarketCapApiKey))
                    .SingleInstance();
-            builder.RegisterType<CoinMarketCapService>()
-                   .InstancePerLifetimeScope();
-            builder.Register(c => new OpenExchangeRatesService(Constants.OpenExchangeRatesAppId, c.Resolve<HttpClient>()))
-                   .InstancePerLifetimeScope();
+            builder.Register(c => new OpenExchangeRatesService(openExchangeRatesAppId))
+                   .SingleInstance();
 
             // handlers
             builder.RegisterAssemblyTypes(typeof(ContainerBuilderExtensions).Assembly)

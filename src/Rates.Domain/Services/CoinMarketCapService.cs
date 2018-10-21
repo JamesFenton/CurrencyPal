@@ -11,51 +11,36 @@ namespace Rates.Domain.Services
 {
     public class CoinMarketCapService
     {
-        private readonly HttpClient _http;
+        private readonly HttpClient _http = new HttpClient();
 
-        public CoinMarketCapService(HttpClient http)
+        public CoinMarketCapService(string apiKey)
         {
-            _http = http;
+            _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", apiKey);
         }
 
         public async Task<List<Rate>> GetCryptoCurrencies(IEnumerable<string> tickers)
         {
-            var tasks = tickers.Select(ticker => GetRate(ticker)).ToList();
+            var symbols = tickers.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t));
+            var symbolsQueryString = string.Join(",", symbols.Values);
 
-            await Task.WhenAll(tasks);
+            var url = $"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={symbolsQueryString}";
+            
+            var response = JObject.Parse(await _http.GetStringAsync(url));
 
-            return tasks.Select(t => t.Result).ToList();
-
-            async Task<Rate> GetRate(string ticker)
+            var rates = symbols.Keys.Select(s =>
             {
-                string coinmarketcapTicker;
-                switch (ticker)
-                {
-                    case "BTCUSD":
-                        coinmarketcapTicker = "bitcoin";
-                        break;
-                    case "ETHUSD":
-                        coinmarketcapTicker = "ethereum";
-                        break;
-                    case "LTCUSD":
-                        coinmarketcapTicker = "litecoin";
-                        break;
-                    case "ZECUSD":
-                        coinmarketcapTicker = "zcash";
-                        break;
-                    case "NEOUSD":
-                        coinmarketcapTicker = "neo";
-                        break;
-                    case "XLMUSD":
-                        coinmarketcapTicker = "stellar";
-                        break;
-                    default:
-                        throw new ArgumentException("Invalid ticker: " + ticker);
-                }
-                var response = await _http.GetStringAsync("https://api.coinmarketcap.com/v1/ticker/" + coinmarketcapTicker);
-                var rateReponse = JArray.Parse(response).First();
-                var rate = rateReponse["price_usd"].Value<double>();
+                var ticker = s;
+                var coinMarketCapSymbol = symbols[s];
+                var rate = response["data"][coinMarketCapSymbol]["quote"]["USD"]["price"].Value<double>();
                 return new Rate(ticker, DateTimeOffset.UtcNow, rate);
+            });
+
+            return rates.ToList();
+
+            string GetCoinMarketCapSymbol(string ticker)
+            {
+                // BTCUSD -> BTC
+                return ticker.Substring(0, 3);
             }
         }
     }
