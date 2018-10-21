@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.ReadModel;
 using System;
@@ -45,36 +46,37 @@ namespace Rates.Domain.ReadModel
                 _database = database;
             }
 
-            public Task<Response> Handle(Query request, CancellationToken cancellationToken)
-            {                
-                var rates = _database.Client.CreateDocumentQuery<RateRm>(_database.RatesRmUri).ToList();
+            public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
+            {
+                TableContinuationToken continuationToken = null;
+                var query = new TableQuery<RateRm>();
+                var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
                 var orderedRates = Constants.FiatTickers
                     .Concat(Constants.MetalsTickers)
                     .Concat(Constants.CryptoTickers)
                     .Select(ticker => rates.FirstOrDefault(r => r.Ticker == ticker))
                     .Where(r => r != null)
-                    .ToList();
+                    .Select(r => new RateDto
+                    {
+                        Ticker = r.Ticker,
+                        Timestamp = r.Timestamp,
+                        Value = r.Value,
+                        Change1Day = r.Change1Day,
+                        Change1Week = r.Change1Week,
+                        Change1Month = r.Change1Month,
+                        Change3Months = r.Change3Months,
+                        Change6Months = r.Change6Months,
+                        Change1Year = r.Change1Year,
+                    }).ToList();
 
-                var rateDtos = orderedRates.Select(r => new RateDto
-                {
-                    Ticker = r.Ticker,
-                    Timestamp = r.Timestamp,
-                    Value = r.Value,
-                    Change1Day = r.Change1Day,
-                    Change1Week = r.Change1Week,
-                    Change1Month = r.Change1Month,
-                    Change3Months = r.Change3Months,
-                    Change6Months = r.Change6Months,
-                    Change1Year = r.Change1Year,
-                }).ToList();
-                var updateTime = rateDtos.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
+                var updateTime = orderedRates.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
 
-                return Task.FromResult(new Response
+                return new Response
                 {
-                    Rates = rateDtos,
+                    Rates = orderedRates,
                     UpdateTime = updateTime
-                });
+                };
             }
         }
     }

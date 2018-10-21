@@ -1,6 +1,5 @@
 ﻿using MediatR;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.ReadModel;
 using Rates.Core.WriteModel;
@@ -10,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Database = Rates.Core.Database;
 
 namespace Rates.Domain.WriteModel
 {
@@ -30,12 +28,12 @@ namespace Rates.Domain.WriteModel
                 var e = request;
                 var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
-                var oneDayChange = GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
-                var oneWeekChange = GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
-                var oneMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
-                var threeMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
-                var sixMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
-                var oneYearChange = GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
+                var oneDayChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
+                var oneWeekChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
+                var oneMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
+                var threeMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
+                var sixMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
+                var oneYearChange = await GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
 
                 // Update the read model entry
                 var updatedRate = new RateRm(
@@ -47,19 +45,18 @@ namespace Rates.Domain.WriteModel
                     change3Months: threeMonthChange,
                     change6Months: sixMonthChange,
                     change1Year: oneYearChange);
-                
-                await _database.Client.UpsertDocumentAsync(_database.RatesRmUri, updatedRate);
+
+                var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
+                await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
 
                 return Unit.Value;
             }
 
-            private double? GetRateChange(string ticker, DateTimeOffset time, double rateNow)
+            private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
             {
-                var id = Rate.CreateId(ticker, time.ToString("o"));
-                var rate = _database.Client.CreateDocumentQuery<Rate>(_database.RatesUri)
-                    .Where(r => r.Id == id)
-                    .AsEnumerable()
-                    .FirstOrDefault();
+                var operation = TableOperation.Retrieve<Rate>(ticker, time.ToString("o"));
+                var tableResult = await _database.Rates.ExecuteAsync(operation);
+                var rate = (Rate)tableResult.Result;
 
                 var rateThen = rate?.Value;
                 return GetChangePercent(rateNow, rateThen);

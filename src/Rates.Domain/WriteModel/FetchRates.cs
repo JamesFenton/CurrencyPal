@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.WindowsAzure.Storage.Table;
 using Rates.Core;
 using Rates.Core.Events;
 using Rates.Core.WriteModel;
@@ -40,7 +41,8 @@ namespace Rates.Domain.WriteModel
 
                 foreach(var rate in rates)
                 {
-                    await _database.Client.UpsertDocumentAsync(_database.RatesUri, rate);
+                    var operation = TableOperation.InsertOrReplace(rate);
+                    await _database.Rates.ExecuteAsync(operation);
                 }
 
                 var events = rates.SelectMany(r => r.GetEvents());

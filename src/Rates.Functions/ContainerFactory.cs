@@ -19,11 +19,8 @@ namespace Rates.Functions
         {
             var container = new ContainerBuilder()
                 .AddMediator()
-                .AddFetcher(Constants.DatabaseConnectionString, Constants.DatabaseAccessKey)
+                .AddFetcher(Constants.DatabaseConnectionString)
                 .Build();
-
-            var database = container.Resolve<Database>();
-            database.Initialise().GetAwaiter().GetResult();
 
             return container;
         }

@@ -29,9 +29,9 @@ namespace Rates.Domain
             return builder;
         }
 
-        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, string databaseUrl, string databaseKey)
+        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, string databaseConnectionString)
         {
-            builder.Register(c => new Database(databaseUrl, databaseKey))
+            builder.Register(c => new Database(databaseConnectionString))
                    .SingleInstance();
             builder.RegisterType<HttpClient>()
                    .SingleInstance();
