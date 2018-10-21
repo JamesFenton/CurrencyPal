@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,18 +12,16 @@ namespace Rates.Domain.Services
 {
     public class OpenExchangeRatesService
     {
-        private readonly string _openExchangeRatesKey;
-        private readonly HttpClient _http;
+        private readonly HttpClient _http = new HttpClient();
 
-        public OpenExchangeRatesService(string openExchangeRatesKey, HttpClient http)
+        public OpenExchangeRatesService(string apiKey)
         {
-            _openExchangeRatesKey = openExchangeRatesKey;
-            _http = http;
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", apiKey);
         }
 
         public async Task<List<Rate>> GetExchangeRates(IEnumerable<string> tickers)
         {
-            var response = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json?app_id=" + _openExchangeRatesKey);
+            var response = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
             var sourceRates = JObject.Parse(response)["rates"] as JObject;
 
             var rates = tickers.Select(t => ConvertRate(t)).ToList();
