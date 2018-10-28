@@ -28,23 +28,34 @@ namespace Rates.Domain.WriteModel
                 var e = request;
                 var timeAdded = DateTimeOffset.Parse(request.TimeKey);
 
-                var oneDayChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
-                var oneWeekChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
-                var oneMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
-                var threeMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
-                var sixMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
-                var oneYearChange = await GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
+                var oneDayChange = GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
+                var oneWeekChange = GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
+                var oneMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
+                var threeMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
+                var sixMonthChange = GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
+                var oneYearChange = GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
+
+                var tasks = new[]
+                {
+                    oneDayChange,
+                    oneWeekChange,
+                    oneMonthChange,
+                    threeMonthChange,
+                    sixMonthChange,
+                    oneYearChange,
+                };
+                var results = await Task.WhenAll(tasks);
 
                 // Update the read model entry
                 var updatedRate = new RateRm(
                     ticker: e.Ticker,
                     value: e.Value,
-                    change1Day: oneDayChange,
-                    change1Week: oneWeekChange,
-                    change1Month: oneMonthChange,
-                    change3Months: threeMonthChange,
-                    change6Months: sixMonthChange,
-                    change1Year: oneYearChange);
+                    change1Day: oneDayChange.Result,
+                    change1Week: oneWeekChange.Result,
+                    change1Month: oneMonthChange.Result,
+                    change3Months: threeMonthChange.Result,
+                    change6Months: sixMonthChange.Result,
+                    change1Year: oneYearChange.Result);
 
                 var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
                 await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
