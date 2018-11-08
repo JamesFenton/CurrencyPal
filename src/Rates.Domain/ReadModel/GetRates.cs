@@ -52,9 +52,7 @@ namespace Rates.Domain.ReadModel
                 var query = new TableQuery<RateRm>();
                 var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
-                var orderedRates = Constants.FiatTickers
-                    .Concat(Constants.MetalsTickers)
-                    .Concat(Constants.CryptoTickers)
+                var orderedRates = Constants.AllTickers
                     .Select(ticker => rates.FirstOrDefault(r => r.Ticker == ticker))
                     .Where(r => r != null)
                     .Select(r => new RateDto

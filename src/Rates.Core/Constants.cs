@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Rates.Core
@@ -18,7 +19,11 @@ namespace Rates.Core
             "ZARMUR"
         };
 
-        public static readonly string[] MetalsTickers = { "XAUUSD", "XAGUSD" };
+        public static readonly string[] MetalsTickers = 
+        {
+            "XAUUSD",
+            "XAGUSD"
+        };
 
         public static readonly string[] CryptoTickers =
         {
@@ -29,5 +34,16 @@ namespace Rates.Core
             "NEOUSD",
             "XLMUSD"
         };
+
+        public static readonly string[] StockTickers =
+        {
+            "SPXUSD",
+        };
+
+        public static readonly string[] AllTickers = FiatTickers
+            .Concat(StockTickers)
+            .Concat(MetalsTickers)
+            .Concat(CryptoTickers)
+            .ToArray();
     }
 }

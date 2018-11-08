@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Domain.Services
 {
-    public class CoinMarketCapService
+    public class CoinMarketCapService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
 
@@ -18,7 +18,7 @@ namespace Rates.Domain.Services
             _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", apiKey);
         }
 
-        public async Task<List<Rate>> GetCryptoCurrencies(IEnumerable<string> tickers)
+        public async Task<List<Rate>> GetRates(IEnumerable<string> tickers)
         {
             var symbols = tickers.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t));
             var symbolsQueryString = string.Join(",", symbols.Values);

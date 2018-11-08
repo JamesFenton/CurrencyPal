@@ -37,6 +37,8 @@ namespace Rates.Domain
                    .SingleInstance();
             builder.Register(c => new CoinMarketCapService(coinMarketCapApiKey))
                    .SingleInstance();
+            builder.RegisterType<FinancialModellingPrepService>()
+                   .SingleInstance();
             builder.Register(c => new OpenExchangeRatesService(openExchangeRatesAppId))
                    .SingleInstance();
 

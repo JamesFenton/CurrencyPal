@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Domain.Services
 {
-    public class OpenExchangeRatesService
+    public class OpenExchangeRatesService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
 
@@ -19,7 +19,7 @@ namespace Rates.Domain.Services
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", apiKey);
         }
 
-        public async Task<List<Rate>> GetExchangeRates(IEnumerable<string> tickers)
+        public async Task<List<Rate>> GetRates(IEnumerable<string> tickers)
         {
             var response = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
             var sourceRates = JObject.Parse(response)["rates"] as JObject;

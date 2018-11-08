@@ -23,15 +23,18 @@ namespace Rates.Domain.WriteModel
         {
             private readonly OpenExchangeRatesService _openExchangeRatesService;
             private readonly CoinMarketCapService _coinMarketCapService;
+            private readonly FinancialModellingPrepService _financialModellingPrepService;
             private readonly Database _database;
 
             public Handler(
                 OpenExchangeRatesService openExchangeRatesService,
                 CoinMarketCapService coinMarketCapService,
+                FinancialModellingPrepService financialModellingPrepService,
                 Database database)
             {
                 _openExchangeRatesService = openExchangeRatesService;
                 _coinMarketCapService = coinMarketCapService;
+                _financialModellingPrepService = financialModellingPrepService;
                 _database = database;
             }
 
@@ -54,8 +57,9 @@ namespace Rates.Domain.WriteModel
                 var openExchangeRateTickers = Constants.FiatTickers.Concat(Constants.MetalsTickers);
                 var tasks = new List<Task<List<Rate>>>
                 {
-                    _openExchangeRatesService.GetExchangeRates(openExchangeRateTickers),
-                    _coinMarketCapService.GetCryptoCurrencies(Constants.CryptoTickers),
+                    _openExchangeRatesService.GetRates(openExchangeRateTickers),
+                    _coinMarketCapService.GetRates(Constants.CryptoTickers),
+                    _financialModellingPrepService.GetRates(Constants.StockTickers),
                 };
 
                 var results = await Task.WhenAll(tasks);
