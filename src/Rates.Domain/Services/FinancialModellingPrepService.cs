@@ -17,7 +17,8 @@ namespace Rates.Domain.Services
         {
             var url = "https://financialmodelingprep.com/api/majors-indexes";
 
-            var response = JObject.Parse(await _http.GetStringAsync(url));
+            var json = await _http.GetStringAsync(url);
+            var response = JObject.Parse(json.Replace("<pre>", ""));
 
             var rates = tickers.Select(ticker =>
             {
