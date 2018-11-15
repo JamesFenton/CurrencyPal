@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Polly.Retry;
+using Rates.Core;
 using Rates.Core.WriteModel;
 using System;
 using System.Collections.Generic;

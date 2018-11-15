@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Rates.Domain
+namespace Rates.Core
 {
     public class Settings
     {
