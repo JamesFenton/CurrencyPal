@@ -27,7 +27,6 @@ namespace Rates.Functions
             var container = new ContainerBuilder()
                 .AddMediator()
                 .AddFetcher(settings)
-                .AddRetryPolicy()
                 .Build();
 
             return container;

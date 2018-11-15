@@ -36,30 +36,17 @@ namespace Rates.Domain
 
             builder.RegisterType<Database>().SingleInstance();
 
-            builder.RegisterType<CoinMarketCapService>().SingleInstance();
-            builder.RegisterType<FinancialModellingPrepService>().SingleInstance();
-            builder.RegisterType<OpenExchangeRatesService>().SingleInstance();
+            // services
+            builder.RegisterType<CoinMarketCapService>().SingleInstance().Named<IRatesService>("service");
+            builder.RegisterType<FinancialModellingPrepService>().SingleInstance().Named<IRatesService>("service");
+            builder.RegisterType<OpenExchangeRatesService>().SingleInstance().Named<IRatesService>("service");
+
+            builder.RegisterDecorator<IRatesService>((c, inner) => new ErrorHandlingRatesService(inner), fromKey: "service");
 
             // handlers
             builder.RegisterAssemblyTypes(typeof(ContainerBuilderExtensions).Assembly)
                    .AsClosedTypesOf(typeof(IRequestHandler<,>))
                    .AsImplementedInterfaces();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddRetryPolicy(this ContainerBuilder builder)
-        {
-            builder.Register(c => Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(new[]
-                {
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(2),
-                    TimeSpan.FromSeconds(4),
-            }))
-            .As<RetryPolicy>()
-            .InstancePerDependency();
 
             return builder;
         }

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Polly.Retry;
 using Rates.Core;
 using Rates.Core.WriteModel;
 using System;
@@ -14,22 +13,21 @@ namespace Rates.Domain.Services
     public class CoinMarketCapService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
-        private readonly RetryPolicy _retryPolicy;
 
-        public CoinMarketCapService(Settings settings, RetryPolicy retryPolicy)
+        public string[] Tickers => Constants.CryptoTickers;
+
+        public CoinMarketCapService(Settings settings)
         {
             _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", settings.CoinMarketCapApiKey);
-            _retryPolicy = retryPolicy;
         }
-
-        public async Task<List<Rate>> GetRates(IEnumerable<string> tickers)
+        
+        public async Task<List<Rate>> GetRates()
         {
-            var symbols = tickers.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t));
+            var symbols = Tickers.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t));
             var symbolsQueryString = string.Join(",", symbols.Values);
 
             var url = $"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={symbolsQueryString}";
-            
-            var json = await _retryPolicy.ExecuteAsync(() => _http.GetStringAsync(url));
+            var json = await _http.GetStringAsync(url);
             var response = JObject.Parse(json);
 
             var rates = symbols.Keys.Select(s =>

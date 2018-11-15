@@ -21,20 +21,14 @@ namespace Rates.Domain.WriteModel
 
         public class Handler : IRequestHandler<Command, IEnumerable<Event>>
         {
-            private readonly OpenExchangeRatesService _openExchangeRatesService;
-            private readonly CoinMarketCapService _coinMarketCapService;
-            private readonly FinancialModellingPrepService _financialModellingPrepService;
+            private readonly IEnumerable<IRatesService> _ratesServices;
             private readonly Database _database;
 
             public Handler(
-                OpenExchangeRatesService openExchangeRatesService,
-                CoinMarketCapService coinMarketCapService,
-                FinancialModellingPrepService financialModellingPrepService,
+                IEnumerable<IRatesService> ratesServices,
                 Database database)
             {
-                _openExchangeRatesService = openExchangeRatesService;
-                _coinMarketCapService = coinMarketCapService;
-                _financialModellingPrepService = financialModellingPrepService;
+                _ratesServices = ratesServices;
                 _database = database;
             }
 
@@ -52,20 +46,12 @@ namespace Rates.Domain.WriteModel
                 return events;
             }
 
-            private async Task<List<Rate>> GetRates()
+            private async Task<IEnumerable<Rate>> GetRates()
             {
-                var openExchangeRateTickers = Constants.FiatTickers.Concat(Constants.MetalsTickers);
-                var tasks = new List<Task<List<Rate>>>
-                {
-                    _openExchangeRatesService.GetRates(openExchangeRateTickers),
-                    _coinMarketCapService.GetRates(Constants.CryptoTickers),
-                    _financialModellingPrepService.GetRates(Constants.StockTickers),
-                };
-
+                var tasks = _ratesServices.Select(r => r.GetRates());
                 var results = await Task.WhenAll(tasks);
 
-                var rates = results.SelectMany(t => t).ToList();
-
+                var rates = results.SelectMany(t => t);
                 return rates;
             }
         }

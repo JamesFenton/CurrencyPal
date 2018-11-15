@@ -8,6 +8,7 @@ namespace Rates.Domain.Services
 {
     public interface IRatesService
     {
-        Task<List<Rate>> GetRates(IEnumerable<string> tickers);
+        string[] Tickers { get; }
+        Task<List<Rate>> GetRates();
     }
 }

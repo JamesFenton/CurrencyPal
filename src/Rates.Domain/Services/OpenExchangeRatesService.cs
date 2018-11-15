@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Polly.Retry;
 using Rates.Core;
 using Rates.Core.WriteModel;
 using System;
@@ -15,20 +14,20 @@ namespace Rates.Domain.Services
     public class OpenExchangeRatesService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
-        private readonly RetryPolicy _retryPolicy;
+        
+        public string[] Tickers => Constants.FiatTickers.Concat(Constants.MetalsTickers).ToArray();
 
-        public OpenExchangeRatesService(Settings settings, RetryPolicy retryPolicy)
+        public OpenExchangeRatesService(Settings settings)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", settings.OpenExchangeRatesApiKey);
-            _retryPolicy = retryPolicy;
         }
 
-        public async Task<List<Rate>> GetRates(IEnumerable<string> tickers)
+        public async Task<List<Rate>> GetRates()
         {
-            var json = await _retryPolicy.ExecuteAsync(() => _http.GetStringAsync("https://openexchangerates.org/api/latest.json"));
+            var json = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
             var sourceRates = JObject.Parse(json)["rates"] as JObject;
 
-            var rates = tickers.Select(t => ConvertRate(t)).ToList();
+            var rates = Tickers.Select(t => ConvertRate(t)).ToList();
             return rates;
 
             Rate ConvertRate(string ticker)
