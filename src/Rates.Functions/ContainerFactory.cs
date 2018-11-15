@@ -17,11 +17,17 @@ namespace Rates.Functions
 
         private static IContainer GetContainer()
         {
+            var settings = new Settings
+            {
+                DatabaseConnectionString = Constants.DatabaseConnectionString,
+                CoinMarketCapApiKey = Constants.CoinMarketCapApiKey,
+                OpenExchangeRatesApiKey = Constants.OpenExchangeRatesAppId,
+            };
+
             var container = new ContainerBuilder()
                 .AddMediator()
-                .AddFetcher(databaseConnectionString: Constants.DatabaseConnectionString,
-                            coinMarketCapApiKey: Constants.CoinMarketCapApiKey,
-                            openExchangeRatesAppId: Constants.OpenExchangeRatesAppId)
+                .AddFetcher(settings)
+                .AddRetryPolicy()
                 .Build();
 
             return container;

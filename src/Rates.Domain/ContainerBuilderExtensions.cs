@@ -1,5 +1,7 @@
 ﻿using Autofac;
 using MediatR;
+using Polly;
+using Polly.Retry;
 using Rates.Core;
 using Rates.Domain.Services;
 using System;
@@ -28,24 +30,36 @@ namespace Rates.Domain
             return builder;
         }
 
-        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, 
-            string databaseConnectionString,
-            string coinMarketCapApiKey,
-            string openExchangeRatesAppId)
+        public static ContainerBuilder AddFetcher(this ContainerBuilder builder, Settings settings)
         {
-            builder.Register(c => new Database(databaseConnectionString))
-                   .SingleInstance();
-            builder.Register(c => new CoinMarketCapService(coinMarketCapApiKey))
-                   .SingleInstance();
-            builder.RegisterType<FinancialModellingPrepService>()
-                   .SingleInstance();
-            builder.Register(c => new OpenExchangeRatesService(openExchangeRatesAppId))
-                   .SingleInstance();
+            builder.RegisterInstance(settings);
+
+            builder.RegisterType<Database>().SingleInstance();
+
+            builder.RegisterType<CoinMarketCapService>().SingleInstance();
+            builder.RegisterType<FinancialModellingPrepService>().SingleInstance();
+            builder.RegisterType<OpenExchangeRatesService>().SingleInstance();
 
             // handlers
             builder.RegisterAssemblyTypes(typeof(ContainerBuilderExtensions).Assembly)
                    .AsClosedTypesOf(typeof(IRequestHandler<,>))
                    .AsImplementedInterfaces();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddRetryPolicy(this ContainerBuilder builder)
+        {
+            builder.Register(c => Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(new[]
+                {
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(4),
+            }))
+            .As<RetryPolicy>()
+            .InstancePerDependency();
 
             return builder;
         }
