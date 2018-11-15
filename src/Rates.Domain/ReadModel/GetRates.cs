@@ -68,7 +68,7 @@ namespace Rates.Domain.ReadModel
                         Change1Year = r.Change1Year,
                     }).ToList();
 
-                var updateTime = orderedRates.Min(r => r.Timestamp).ToUnixTimeMilliseconds();
+                var updateTime = orderedRates.Max(r => r.Timestamp).ToUnixTimeMilliseconds();
 
                 return new Response
                 {
