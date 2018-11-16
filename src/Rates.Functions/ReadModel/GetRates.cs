@@ -19,7 +19,7 @@ namespace Rates.Functions.ReadModel
     {
         [FunctionName("GetRates")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")]HttpRequestMessage req,
             ILogger log)
         {
             var mediator = ContainerFactory.Container.Resolve<IMediator>();

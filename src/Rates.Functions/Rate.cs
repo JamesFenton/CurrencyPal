@@ -12,6 +12,9 @@ namespace Rates.Functions
         public static Rate GBPZAR => new Rate("GBPZAR", "GBPZAR", null); 
         public static Rate EURZAR => new Rate("EURZAR", "EURZAR", null); 
         public static Rate ZARMUR => new Rate("ZARMUR", "ZARMUR", null);
+        // stocks
+        public static Rate VOOUSD => new Rate("VOOUSD", "S&P 500", "https://www.bloomberg.com/quote/VOO:US");
+        // metals
         public static Rate XAUUSD => new Rate("XAUUSD", "XAUUSD", null); 
         public static Rate XAGUSD => new Rate("XAGUSD", "XAGUSD", null);
         // crypto
@@ -21,8 +24,6 @@ namespace Rates.Functions
         public static Rate LTCUSD => new Rate("LTCUSD", "LTCUSD", null);
         public static Rate NEOUSD => new Rate("NEOUSD", "NEOUSD", null);
         public static Rate XLMUSD => new Rate("XLMUSD", "XLMUSD", null);
-        // stocks
-        public static Rate VOOUSD => new Rate("VOOUSD", "S&P 500", "https://www.bloomberg.com/quote/VOO:US");
 
         public static Rate[] All => typeof(Rate)
             .GetProperties()

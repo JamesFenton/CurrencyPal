@@ -15,7 +15,7 @@ var app = new Vue({
         getRates: function () {
             this.requesting = true;
             this.errorMessage = null;
-            axios.get(this.backEndAddress + "/api/GetRates")
+            axios.get(this.backEndAddress + "/api/rates")
                 .then(response => {
                     var dto = response.data;
                     this.requesting = false;
