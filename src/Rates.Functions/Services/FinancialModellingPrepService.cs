@@ -5,10 +5,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Rates.Core;
-using Rates.Core.WriteModel;
+using Rates.Functions.WriteModel;
 
-namespace Rates.Domain.Services
+namespace Rates.Functions.Services
 {
     public class FinancialModellingPrepService : IRatesService
     {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Core
+namespace Rates.Functions
 {
     public class Database
     {

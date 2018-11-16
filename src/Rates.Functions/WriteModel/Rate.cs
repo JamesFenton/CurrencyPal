@@ -1,10 +1,10 @@
-﻿using Rates.Core.Events;
+﻿using Rates.Functions.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Rates.Core.WriteModel
+namespace Rates.Functions.WriteModel
 {
     public class Rate : Model
     {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Polly;
-using Rates.Core.WriteModel;
+using Rates.Functions.WriteModel;
 
-namespace Rates.Domain.Services
+namespace Rates.Functions.Services
 {
     public class ErrorHandlingRatesService : IRatesService
     {

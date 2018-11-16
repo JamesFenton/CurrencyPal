@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Core.ReadModel
+namespace Rates.Functions.ReadModel
 {
     public class RateRm : TableEntity
     {

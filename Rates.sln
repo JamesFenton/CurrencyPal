@@ -11,10 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Core", "src\Rates.Core\Rates.Core.csproj", "{27ABF32A-1D08-466E-82DC-36BB84C67110}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Domain", "src\Rates.Domain\Rates.Domain.csproj", "{FE10EFAD-0CC8-4978-8187-2A8EA465D1D9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Functions", "src\Rates.Functions\Rates.Functions.csproj", "{E050F867-3978-463F-85EA-690DC795C9F3}"
 EndProject
 Global
@@ -23,14 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{27ABF32A-1D08-466E-82DC-36BB84C67110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27ABF32A-1D08-466E-82DC-36BB84C67110}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27ABF32A-1D08-466E-82DC-36BB84C67110}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27ABF32A-1D08-466E-82DC-36BB84C67110}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE10EFAD-0CC8-4978-8187-2A8EA465D1D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE10EFAD-0CC8-4978-8187-2A8EA465D1D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE10EFAD-0CC8-4978-8187-2A8EA465D1D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE10EFAD-0CC8-4978-8187-2A8EA465D1D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,10 +1,10 @@
-﻿using Rates.Core.WriteModel;
+﻿using Rates.Functions.WriteModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Domain.Services
+namespace Rates.Functions.Services
 {
     public interface IRatesService
     {

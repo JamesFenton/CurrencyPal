@@ -1,15 +1,20 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Text;
 
-namespace Rates.Core
+namespace Rates.Functions
 {
     public static class Constants
     {
         public static string DatabaseConnectionString => Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING");
         public static string CoinMarketCapApiKey => Environment.GetEnvironmentVariable("CMC_API_KEY");
         public static string OpenExchangeRatesAppId => Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID");
+        
+        internal const string RatesAddedQueue = "rates-added";
 
         public static readonly string[] FiatTickers = 
         {
@@ -45,5 +50,17 @@ namespace Rates.Core
             .Concat(MetalsTickers)
             .Concat(CryptoTickers)
             .ToArray();
+
+
+        internal readonly static JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            TypeNameHandling = TypeNameHandling.Auto,
+        };
+
+        internal readonly static JsonMediaTypeFormatter JsonFormatter = new JsonMediaTypeFormatter
+        {
+            SerializerSettings = JsonSettings
+        };
     }
 }

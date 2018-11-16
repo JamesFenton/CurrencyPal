@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Core.Events
+namespace Rates.Functions.Events
 {
     public class RateAdded : Event
     {
