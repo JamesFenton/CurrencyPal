@@ -64,9 +64,9 @@ namespace Rates.Functions.ReadModel
 
         private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
         {
-            var operation = TableOperation.Retrieve<Rate>(ticker, time.ToString("o"));
+            var operation = TableOperation.Retrieve<RateEntity>(ticker, time.ToString("o"));
             var tableResult = await _database.Rates.ExecuteAsync(operation);
-            var rate = (Rate)tableResult.Result;
+            var rate = (RateEntity)tableResult.Result;
 
             var rateThen = rate?.Value;
             return GetChangePercent(rateNow, rateThen);

@@ -41,6 +41,8 @@ namespace Rates.Functions.ReadModel
             public double? Change3Months { get; set; }
             public double? Change6Months { get; set; }
             public double? Change1Year { get; set; }
+            public string Name { get; set; }
+            public string Href { get; set; }
             public bool OutOfDate => Timestamp < DateTimeOffset.UtcNow.AddHours(-1);
         }
 
@@ -69,20 +71,22 @@ namespace Rates.Functions.ReadModel
                 var query = new TableQuery<RateRm>();
                 var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
-                var orderedRates = Constants.AllTickers
-                    .Select(ticker => rates.FirstOrDefault(r => r.Ticker == ticker))
-                    .Where(r => r != null)
+                var orderedRates = Rate.All
+                    .Select(rate => (rate: rate, entity: rates.FirstOrDefault(r => r.Ticker == rate.Ticker)))
+                    .Where(r => r.entity != null)
                     .Select(r => new RateDto
                     {
-                        Ticker = r.Ticker,
-                        Timestamp = r.Timestamp,
-                        Value = r.Value,
-                        Change1Day = r.Change1Day,
-                        Change1Week = r.Change1Week,
-                        Change1Month = r.Change1Month,
-                        Change3Months = r.Change3Months,
-                        Change6Months = r.Change6Months,
-                        Change1Year = r.Change1Year,
+                        Ticker = r.entity.Ticker,
+                        Timestamp = r.entity.Timestamp,
+                        Value = r.entity.Value,
+                        Change1Day = r.entity.Change1Day,
+                        Change1Week = r.entity.Change1Week,
+                        Change1Month = r.entity.Change1Month,
+                        Change3Months = r.entity.Change3Months,
+                        Change6Months = r.entity.Change6Months,
+                        Change1Year = r.entity.Change1Year,
+                        Name = r.rate.Name,
+                        Href = r.rate.Href,
                     }).ToList();
 
                 var updateTime = orderedRates.Max(r => r.Timestamp).ToUnixTimeMilliseconds();

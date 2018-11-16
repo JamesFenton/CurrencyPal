@@ -48,7 +48,8 @@
                     </thead>
                     <tbody>
                         <tr v-for="rate in rates" v-bind:class="{ 'table-danger': rate.outOfDate }">
-                            <td>{{rate.ticker}}</td>
+                            <td v-if="rate.href"><a v-bind:href="rate.href">{{rate.name}}</a></td>
+                            <td v-if="!rate.href">{{rate.name}}</td>
                             <td>{{rate.value | round}}</td>
                             <td v-bind:class="[rate.change1Day > 0 ? 'positive-change' : '', rate.change1Day < 0 ? 'negative-change' : '']">
                                 {{rate.change1Day | roundedPercentage}}

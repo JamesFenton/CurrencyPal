@@ -12,14 +12,14 @@ namespace Rates.Functions.Services
     {
         private readonly IRatesService _inner;
 
-        public string[] Tickers => new string[0];
+        public Rate[] Rates => new Rate[0];
 
         public ErrorHandlingRatesService(IRatesService inner)
         {
             _inner = inner;
         }
 
-        public async Task<List<Rate>> GetRates()
+        public async Task<IEnumerable<RateEntity>> GetRates()
         {
             var policy = Policy
                 .Handle<Exception>()
@@ -30,15 +30,7 @@ namespace Rates.Functions.Services
                     TimeSpan.FromSeconds(4),
             });
 
-            try
-            {
-                return await policy.ExecuteAsync(() => _inner.GetRates());
-            }
-            catch(Exception)
-            {
-                // return an empty list to prevent this failure killing the other services
-                return new List<Rate>();
-            }
+            return await policy.ExecuteAsync(() => _inner.GetRates());
         }
     }
 }

@@ -44,10 +44,10 @@ namespace Rates.Functions
                 fromKey: "cmc",
                 toKey: "cryptos");
 
-            builder.RegisterType<FinancialModellingPrepService>().Named<IRatesService>("fmp").SingleInstance();
+            builder.RegisterType<IexService>().Named<IRatesService>("iex").SingleInstance();
             builder.RegisterDecorator<IRatesService>(
                 (c, inner) => new ErrorHandlingRatesService(inner),
-                fromKey: "fmp",
+                fromKey: "iex",
                 toKey: "stocks");
 
             builder.RegisterType<OpenExchangeRatesService>().Named<IRatesService>("oer").SingleInstance();

@@ -8,7 +8,7 @@ namespace Rates.Functions.Services
 {
     public interface IRatesService
     {
-        string[] Tickers { get; }
-        Task<List<Rate>> GetRates();
+        Rate[] Rates { get; }
+        Task<IEnumerable<RateEntity>> GetRates();
     }
 }

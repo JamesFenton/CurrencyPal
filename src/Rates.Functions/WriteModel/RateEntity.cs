@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Rates.Functions.WriteModel
 {
-    public class Rate : Model
+    public class RateEntity : Model
     {
         /// <summary>
         /// Unique indentifier to the rate, eg USDZAR
@@ -23,9 +23,9 @@ namespace Rates.Functions.WriteModel
         /// </summary>
         public double Value { get; set; }
 
-        public Rate() { }
+        public RateEntity() { }
 
-        public Rate(string ticker, DateTimeOffset now, double value)
+        public RateEntity(string ticker, DateTimeOffset now, double value)
         {
             PartitionKey = ticker;
             RowKey = GetNearestHour(now).ToString("o"); // ISO format

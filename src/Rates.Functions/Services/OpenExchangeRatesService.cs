@@ -13,31 +13,40 @@ namespace Rates.Functions.Services
     public class OpenExchangeRatesService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
-        
-        public string[] Tickers => Constants.FiatTickers.Concat(Constants.MetalsTickers).ToArray();
+
+        public Rate[] Rates => new[]
+        {
+            Rate.USDZAR,
+            Rate.GBPZAR,
+            Rate.EURZAR,
+            Rate.ZARMUR,
+            Rate.XAUUSD,
+            Rate.XAGUSD,
+        };
 
         public OpenExchangeRatesService(Settings settings)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", settings.OpenExchangeRatesApiKey);
         }
 
-        public async Task<List<Rate>> GetRates()
+        public async Task<IEnumerable<RateEntity>> GetRates()
         {
             var json = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
             var sourceRates = JObject.Parse(json)["rates"] as JObject;
 
-            var rates = Tickers.Select(t => ConvertRate(t)).ToList();
+            var rates = Rates.Select(t => ConvertRate(t));
             return rates;
 
-            Rate ConvertRate(string ticker)
+            RateEntity ConvertRate(Rate rate)
             {
+                var ticker = rate.Ticker;
                 var source = ticker.Substring(0, 3);
                 var dest = ticker.Substring(3, 3);
 
                 var sourceRate = sourceRates[source].Value<double>();
                 var destRate = sourceRates[dest].Value<double>();
                 var crossRate = destRate / sourceRate;
-                return new Rate(ticker, DateTimeOffset.UtcNow, crossRate);
+                return new RateEntity(ticker, DateTimeOffset.UtcNow, crossRate);
             }
         }
     }

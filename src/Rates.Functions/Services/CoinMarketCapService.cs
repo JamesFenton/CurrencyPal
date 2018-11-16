@@ -13,16 +13,24 @@ namespace Rates.Functions.Services
     {
         private readonly HttpClient _http = new HttpClient();
 
-        public string[] Tickers => Constants.CryptoTickers;
+        public Rate[] Rates => new[]
+        {
+            Rate.BTCUSD,
+            Rate.ETHUSD,
+            Rate.ZECUSD,
+            Rate.LTCUSD,
+            Rate.NEOUSD,
+            Rate.XLMUSD,
+        };
 
         public CoinMarketCapService(Settings settings)
         {
             _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", settings.CoinMarketCapApiKey);
         }
         
-        public async Task<List<Rate>> GetRates()
+        public async Task<IEnumerable<RateEntity>> GetRates()
         {
-            var symbols = Tickers.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t));
+            var symbols = Rates.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t.Ticker));
             var symbolsQueryString = string.Join(",", symbols.Values);
 
             var url = $"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={symbolsQueryString}";
@@ -31,19 +39,19 @@ namespace Rates.Functions.Services
 
             var rates = symbols.Keys.Select(s =>
             {
-                var ticker = s;
+                var ticker = s.Ticker;
                 var coinMarketCapSymbol = symbols[s];
                 var rate = response["data"][coinMarketCapSymbol]["quote"]["USD"]["price"].Value<double>();
-                return new Rate(ticker, DateTimeOffset.UtcNow, rate);
+                return new RateEntity(ticker, DateTimeOffset.UtcNow, rate);
             });
 
-            return rates.ToList();
-
-            string GetCoinMarketCapSymbol(string ticker)
-            {
-                // BTCUSD -> BTC
-                return ticker.Substring(0, 3);
-            }
+            return rates;
+        }
+        
+        private string GetCoinMarketCapSymbol(string ticker)
+        {
+            // BTCUSD -> BTC
+            return ticker.Substring(0, 3);
         }
     }
 }
