@@ -10,10 +10,6 @@ namespace Rates.Functions
 {
     public static class Constants
     {
-        public static string DatabaseConnectionString => Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING");
-        public static string CoinMarketCapApiKey => Environment.GetEnvironmentVariable("CMC_API_KEY");
-        public static string OpenExchangeRatesAppId => Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID");
-        
         internal const string RatesAddedQueue = "rates-added";
 
         public static readonly string[] FiatTickers = 

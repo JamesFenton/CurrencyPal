@@ -38,11 +38,23 @@ namespace Rates.Functions
             builder.RegisterType<Database>().SingleInstance();
 
             // services
-            builder.RegisterType<CoinMarketCapService>().SingleInstance().Named<IRatesService>("service");
-            builder.RegisterType<FinancialModellingPrepService>().SingleInstance().Named<IRatesService>("service");
-            builder.RegisterType<OpenExchangeRatesService>().SingleInstance().Named<IRatesService>("service");
+            builder.RegisterType<CoinMarketCapService>().Named<IRatesService>("cmc").SingleInstance();
+            builder.RegisterDecorator<IRatesService>(
+                (c, inner) => new ErrorHandlingRatesService(inner),
+                fromKey: "cmc",
+                toKey: "cryptos");
 
-            builder.RegisterDecorator<IRatesService>((c, inner) => new ErrorHandlingRatesService(inner), fromKey: "service");
+            builder.RegisterType<FinancialModellingPrepService>().Named<IRatesService>("fmp").SingleInstance();
+            builder.RegisterDecorator<IRatesService>(
+                (c, inner) => new ErrorHandlingRatesService(inner),
+                fromKey: "fmp",
+                toKey: "stocks");
+
+            builder.RegisterType<OpenExchangeRatesService>().Named<IRatesService>("oer").SingleInstance();
+            builder.RegisterDecorator<IRatesService>(
+                (c, inner) => new ErrorHandlingRatesService(inner),
+                fromKey: "oer",
+                toKey: "forex");
 
             // handlers
             builder.RegisterAssemblyTypes(typeof(ContainerFactory).Assembly)
@@ -56,9 +68,9 @@ namespace Rates.Functions
         {
             var settings = new Settings
             {
-                DatabaseConnectionString = Constants.DatabaseConnectionString,
-                CoinMarketCapApiKey = Constants.CoinMarketCapApiKey,
-                OpenExchangeRatesApiKey = Constants.OpenExchangeRatesAppId,
+                DatabaseConnectionString = Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING"),
+                CoinMarketCapApiKey = Environment.GetEnvironmentVariable("CMC_API_KEY"),
+                OpenExchangeRatesApiKey = Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID"),
             };
 
             var container = new ContainerBuilder()
