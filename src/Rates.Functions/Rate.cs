@@ -8,22 +8,22 @@ namespace Rates.Functions
     public class Rate
     {
         // forex
-        public static Rate USDZAR => new Rate("USDZAR", "USDZAR", null); 
-        public static Rate GBPZAR => new Rate("GBPZAR", "GBPZAR", null); 
-        public static Rate EURZAR => new Rate("EURZAR", "EURZAR", null); 
-        public static Rate ZARMUR => new Rate("ZARMUR", "ZARMUR", null);
+        public static Rate USDZAR => new Rate("USDZAR", "USDZAR", "https://www.xe.com/currencycharts/?from=USD&to=ZAR"); 
+        public static Rate GBPZAR => new Rate("GBPZAR", "GBPZAR", "https://www.xe.com/currencycharts/?from=GBP&to=ZAR"); 
+        public static Rate EURZAR => new Rate("EURZAR", "EURZAR", "https://www.xe.com/currencycharts/?from=EUR&to=ZAR"); 
+        public static Rate ZARMUR => new Rate("ZARMUR", "ZARMUR", "https://www.xe.com/currencycharts/?from=ZAR&to=MUR");
         // stocks
         public static Rate VOOUSD => new Rate("VOOUSD", "S&P 500", "https://www.bloomberg.com/quote/VOO:US");
         // metals
-        public static Rate XAUUSD => new Rate("XAUUSD", "XAUUSD", null); 
-        public static Rate XAGUSD => new Rate("XAGUSD", "XAGUSD", null);
+        public static Rate XAUUSD => new Rate("XAUUSD", "Gold", "https://www.xe.com/currencycharts/?from=XAU&to=USD"); 
+        public static Rate XAGUSD => new Rate("XAGUSD", "Silver", "https://www.xe.com/currencycharts/?from=XAG&to=USD");
         // crypto
-        public static Rate BTCUSD => new Rate("BTCUSD", "BTCUSD", null); 
-        public static Rate ETHUSD => new Rate("ETHUSD", "ETHUSD", null);
-        public static Rate ZECUSD => new Rate("ZECUSD", "ZECUSD", null);
-        public static Rate LTCUSD => new Rate("LTCUSD", "LTCUSD", null);
-        public static Rate NEOUSD => new Rate("NEOUSD", "NEOUSD", null);
-        public static Rate XLMUSD => new Rate("XLMUSD", "XLMUSD", null);
+        public static Rate BTCUSD => new Rate("BTCUSD", "BTCUSD", "https://coinmarketcap.com/currencies/bitcoin/"); 
+        public static Rate ETHUSD => new Rate("ETHUSD", "ETHUSD", "https://coinmarketcap.com/currencies/ethereum/");
+        public static Rate ZECUSD => new Rate("ZECUSD", "ZECUSD", "https://coinmarketcap.com/currencies/zcash/");
+        public static Rate LTCUSD => new Rate("LTCUSD", "LTCUSD", "https://coinmarketcap.com/currencies/litecoin/");
+        public static Rate NEOUSD => new Rate("NEOUSD", "NEOUSD", "https://coinmarketcap.com/currencies/neo/");
+        public static Rate XLMUSD => new Rate("XLMUSD", "XLMUSD", "https://coinmarketcap.com/currencies/stellar/");
 
         public static Rate[] All => typeof(Rate)
             .GetProperties()
