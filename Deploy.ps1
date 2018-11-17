@@ -9,7 +9,7 @@ param(
 function Replace-Text($filePath, $replacementToken, $value) {
 	$file = (Get-Content $filePath) -join "`n"
 	if ($file.Contains($replacementToken)) {
-		$file.Replace($replacementToken, $value) | Out-File $filePath
+		$file.Replace($replacementToken, $value) | Out-File $filePath -Encoding UTF8
 	}
 }
 
