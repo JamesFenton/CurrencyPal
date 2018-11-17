@@ -15,14 +15,16 @@ function Replace-Text($filePath, $replacementToken, $value) {
 
 function Get-Properties($file) {
 	$extension = [System.IO.Path]::GetExtension($file)
-	if ($extension -eq ".html") {
-		return @{ContentType = "text/html"}
+	$properties = switch ($extension) {
+		".html" { @{ContentType = "text/html"} }
+		".js" { @{ContentType = "application/javascript"} }
+		default { @{} }
 	}
-	return @{}
+	return $properties
 }
 
 if ($applicationInsightsKey -ne $null) {
-	Replace-Text "$websiteFolder\index.html" "<insert instrumentation key>" $applicationInsightsKey
+	Replace-Text "$websiteFolder\index.html" "<your instrumentation key>" $applicationInsightsKey
 }
 
 # Upload static files to storage
