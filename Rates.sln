@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Functions", "src\Rates.Functions\Rates.Functions.csproj", "{E050F867-3978-463F-85EA-690DC795C9F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rates.Web", "src\Rates.Web\Rates.Web.csproj", "{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E050F867-3978-463F-85EA-690DC795C9F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

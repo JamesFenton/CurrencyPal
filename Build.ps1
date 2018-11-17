@@ -13,7 +13,7 @@ function Test-ExitCode($exitCode) {
 $version = "$buildVersion.$buildCounter"
 $functionsPublishDirectory = "$PSScriptRoot\publish\Rates.Functions"
 
-# publish web
+# publish functions
 dotnet publish "$PSScriptRoot\src\Rates.Functions" -o $functionsPublishDirectory -c Release
 Test-ExitCode $lastExitCode
 
@@ -27,7 +27,9 @@ New-Item -ItemType Directory -Path $artifactDirectory
 Compress-Archive $functionsPublishDirectory\** "$artifactDirectory\Rates.Functions.$version.zip"
 Test-ExitCode $lastExitCode
 
-# zip front-end
-Copy-Item "$PSScriptRoot\src\Rates.Functions\wwwroot" "$artifactDirectory\Rates.Web" -Recurse
+# zip website
+$websiteDirectory = "$PSScriptRoot\src\Rates.Web\wwwroot"
+Copy-Item "$websiteDirectory\settings.prod.js" "$websiteDirectory\settings.js" -Force
+Copy-Item "$websiteDirectory\**" "$artifactDirectory\Rates.Web" -Recurse
 
 Copy-Item "$PSScriptRoot\Deploy.ps1" $artifactDirectory
