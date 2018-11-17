@@ -30,6 +30,6 @@ Test-ExitCode $lastExitCode
 # zip website
 $websiteDirectory = "$PSScriptRoot\src\Rates.Web\wwwroot"
 Copy-Item "$websiteDirectory\settings.prod.js" "$websiteDirectory\settings.js" -Force
-Copy-Item "$websiteDirectory\**" "$artifactDirectory\Rates.Web" -Recurse
+Copy-Item "$websiteDirectory" "$artifactDirectory\Rates.Web" -Recurse
 
 Copy-Item "$PSScriptRoot\Deploy.ps1" $artifactDirectory
