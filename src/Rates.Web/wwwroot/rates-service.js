@@ -21,8 +21,6 @@ export class RatesService {
                 return res;
             });
     }
-
-    private 
 }
 
 export default new RatesService();
