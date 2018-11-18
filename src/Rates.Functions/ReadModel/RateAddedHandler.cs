@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,48 +6,39 @@ using Autofac;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Rates.Functions.Events;
 using Rates.Functions.WriteModel;
+using System.Linq;
 
 namespace Rates.Functions.ReadModel
 {
-    public class RateAddedHandler : IRequestHandler<RateAdded>
+    public class RateAddedHandler
     {
+        private static Database _database = ContainerFactory.Container.Resolve<Database>();
+
         [FunctionName("RateAddedHandler")]
         public static async Task Run(
             [QueueTrigger(Constants.RatesAddedQueue)]string myQueueItem,
             ILogger log)
         {
-            var rateAdded = JsonConvert.DeserializeObject<RateAdded>(myQueueItem, Constants.JsonSettings);
-            var mediator = ContainerFactory.Container.Resolve<IMediator>();
+            var rate = JsonConvert.DeserializeObject<RateEntity>(myQueueItem);
 
-            await mediator.Send(rateAdded);
-            log.LogInformation($"Rate {rateAdded.Ticker} {rateAdded.TimeKey} handled successfully");
-        }
+            var rateModel = Rate.All.Single(r => r.Ticker == rate.Ticker);
+            var timeAdded = DateTimeOffset.Parse(rate.TimeKey);
 
-        private readonly Database _database;
-
-        public RateAddedHandler(Database database)
-        {
-            _database = database;
-        }
-
-        public async Task<Unit> Handle(RateAdded request, CancellationToken cancellationToken)
-        {
-            var e = request;
-            var timeAdded = DateTimeOffset.Parse(request.TimeKey);
-
-            var oneDayChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-1), e.Value);
-            var oneWeekChange = await GetRateChange(request.Ticker, timeAdded.AddDays(-7), e.Value);
-            var oneMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-1), e.Value);
-            var threeMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-3), e.Value);
-            var sixMonthChange = await GetRateChange(request.Ticker, timeAdded.AddMonths(-6), e.Value);
-            var oneYearChange = await GetRateChange(request.Ticker, timeAdded.AddYears(-1), e.Value);
+            // calculate changes
+            var oneDayChange = await GetRateChange(rate.Ticker, timeAdded.AddDays(-1), rate.Value);
+            var oneWeekChange = await GetRateChange(rate.Ticker, timeAdded.AddDays(-7), rate.Value);
+            var oneMonthChange = await GetRateChange(rate.Ticker, timeAdded.AddMonths(-1), rate.Value);
+            var threeMonthChange = await GetRateChange(rate.Ticker, timeAdded.AddMonths(-3), rate.Value);
+            var sixMonthChange = await GetRateChange(rate.Ticker, timeAdded.AddMonths(-6), rate.Value);
+            var oneYearChange = await GetRateChange(rate.Ticker, timeAdded.AddYears(-1), rate.Value);
 
             // Update the read model entry
             var updatedRate = new RateRm(
-                ticker: e.Ticker,
-                value: e.Value,
+                ticker: rate.Ticker,
+                name: rateModel.Name,
+                href: rateModel.Href,
+                value: rate.Value,
                 change1Day: oneDayChange,
                 change1Week: oneWeekChange,
                 change1Month: oneMonthChange,
@@ -56,13 +46,14 @@ namespace Rates.Functions.ReadModel
                 change6Months: sixMonthChange,
                 change1Year: oneYearChange);
 
+            // update read model entry
             var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
             await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
 
-            return Unit.Value;
+            log.LogInformation($"Rate {rate.Ticker} {rate.TimeKey} handled successfully");
         }
 
-        private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
+        private static async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
         {
             var operation = TableOperation.Retrieve<RateEntity>(ticker, time.ToString("o"));
             var tableResult = await _database.Rates.ExecuteAsync(operation);
@@ -72,7 +63,7 @@ namespace Rates.Functions.ReadModel
             return GetChangePercent(rateNow, rateThen);
         }
 
-        private double? GetChangePercent(double rateNow, double? rateThen)
+        private static double? GetChangePercent(double rateNow, double? rateThen)
         {
             if (!rateThen.HasValue)
                 return null;

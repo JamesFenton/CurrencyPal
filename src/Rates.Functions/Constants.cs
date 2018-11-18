@@ -11,16 +11,13 @@ namespace Rates.Functions
     public static class Constants
     {
         internal const string RatesAddedQueue = "rates-added";
-        
-        internal readonly static JsonSerializerSettings JsonSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            TypeNameHandling = TypeNameHandling.Auto,
-        };
 
         internal readonly static JsonMediaTypeFormatter JsonFormatter = new JsonMediaTypeFormatter
         {
-            SerializerSettings = JsonSettings
+            SerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            }
         };
     }
 }

@@ -1,4 +1,4 @@
-﻿using Rates.Functions.Events;
+﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Rates.Functions.WriteModel
 {
-    public class RateEntity : Model
+    public class RateEntity : TableEntity
     {
         /// <summary>
         /// Unique indentifier to the rate, eg USDZAR
@@ -30,8 +30,6 @@ namespace Rates.Functions.WriteModel
             PartitionKey = ticker;
             RowKey = GetNearestHour(now).ToString("o"); // ISO format
             Value = value;
-
-            AddEvent(new RateAdded(Ticker, TimeKey, Value));
         }
 
         private static DateTimeOffset GetNearestHour(DateTimeOffset now)
@@ -45,10 +43,10 @@ namespace Rates.Functions.WriteModel
                 previousHour,
                 currentHour,
                 nextHour,
-            }.Select(t => new Tuple<DateTimeOffset, double>(t, Math.Abs((now - t).TotalMilliseconds))) // (time, TimeSpan from now)
-            .OrderBy(t => t.Item2) // take the time that is closest to now
+            }.Select(t => (time: t, timeFromNow: Math.Abs((now - t).TotalMilliseconds))) // (time, TimeSpan from now)
+            .OrderBy(t => t.timeFromNow) // take the time that is closest to now
             .First()
-            .Item1;
+            .time;
         }
     }
 }

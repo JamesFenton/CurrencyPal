@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using MediatR;
 using Rates.Functions.Services;
+using Rates.Functions.WriteModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,31 +11,14 @@ namespace Rates.Functions
 {
     static class ContainerFactory
     {
-        private static IContainer _container;
-
-        internal static IContainer Container => _container ?? (_container = GetContainer());
-
-        public static ContainerBuilder AddMediator(this ContainerBuilder builder)
-        {
-            builder
-              .RegisterType<Mediator>()
-              .As<IMediator>()
-              .InstancePerLifetimeScope();
-
-            builder.Register<ServiceFactory>(ctx =>
-            {
-                var c = ctx.Resolve<IComponentContext>();
-                return t => c.TryResolve(t, out var o) ? o : null;
-            }).InstancePerLifetimeScope();
-
-            return builder;
-        }
+        internal static readonly IContainer Container = GetContainer();
 
         public static ContainerBuilder AddFetcher(this ContainerBuilder builder, Settings settings)
         {
             builder.RegisterInstance(settings);
 
             builder.RegisterType<Database>().SingleInstance();
+            builder.RegisterType<RateSaver>().SingleInstance();
 
             // services
             builder.RegisterType<CoinMarketCapService>().Named<IRatesService>("cmc").SingleInstance();
@@ -56,11 +39,6 @@ namespace Rates.Functions
                 fromKey: "oer",
                 toKey: "forex");
 
-            // handlers
-            builder.RegisterAssemblyTypes(typeof(ContainerFactory).Assembly)
-                   .AsClosedTypesOf(typeof(IRequestHandler<,>))
-                   .AsImplementedInterfaces();
-
             return builder;
         }
 
@@ -74,7 +52,6 @@ namespace Rates.Functions
             };
 
             var container = new ContainerBuilder()
-                .AddMediator()
                 .AddFetcher(settings)
                 .Build();
 

@@ -12,6 +12,8 @@ namespace Rates.Functions.ReadModel
         public const string PartitionKeyLabel = "readmodel";
 
         public string Ticker => RowKey;
+        public string Name { get; set; }
+        public string Href { get; set; }
         public double Value { get; set; }
 
         public double? Change1Day { get; set; }
@@ -25,6 +27,8 @@ namespace Rates.Functions.ReadModel
 
         public RateRm(
             string ticker,
+            string name,
+            string href,
             double value,
             double? change1Day,
             double? change1Week,
@@ -35,6 +39,8 @@ namespace Rates.Functions.ReadModel
         {
             PartitionKey = PartitionKeyLabel;
             RowKey = ticker;
+            Name = name;
+            Href = href;
             Value = value;
             Change1Day = change1Day;
             Change1Week = change1Week;

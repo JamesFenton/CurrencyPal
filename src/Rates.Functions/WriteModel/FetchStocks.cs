@@ -1,8 +1,4 @@
-﻿using MediatR;
-using Microsoft.WindowsAzure.Storage.Table;
-using Rates.Functions.Events;
-using Rates.Functions.WriteModel;
-using Rates.Functions.Services;
+﻿using Rates.Functions.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +20,16 @@ namespace Rates.Functions.WriteModel
             [Queue(Constants.RatesAddedQueue)] ICollector<string> destinationQueue,
             ILogger log)
         {
-            var mediator = ContainerFactory.Container.Resolve<IMediator>();
             var service = ContainerFactory.Container.ResolveNamed<IRatesService>("stocks");
+            var rateSaver = ContainerFactory.Container.Resolve<RateSaver>();
 
-            var command = new FetchRates.Command { Service = service };
-            var events = await mediator.Send(command);
+            var rates = await service.GetRates();
+            await rateSaver.Save(rates);
 
-            log.LogInformation($"Sending {events.Count()} events to {Constants.RatesAddedQueue} queue");
-            foreach (var @event in events)
+            log.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
+            foreach (var rate in rates)
             {
-                var json = JsonConvert.SerializeObject(@event, Constants.JsonSettings);
+                var json = JsonConvert.SerializeObject(rate);
                 destinationQueue.Add(json);
             }
         }
