@@ -55,5 +55,6 @@ var app = new Vue({
         this.changePeriod = window.localStorage.getItem("changePeriod");
         if (!this.changePeriod)
             this.changePeriod = "1w";
+        document.getElementById("app").removeAttribute("hidden");
     }
 });
