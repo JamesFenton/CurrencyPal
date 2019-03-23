@@ -6,14 +6,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEE5D946-5A46-41A5-826F-7288663978DB}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
-		Build.ps1 = Build.ps1
-		Deploy.ps1 = Deploy.ps1
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Functions", "src\Rates.Functions\Rates.Functions.csproj", "{E050F867-3978-463F-85EA-690DC795C9F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rates.Web", "src\Rates.Web\Rates.Web.csproj", "{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rates.Web", "src\Rates.Web\Rates.Web.csproj", "{EEFEDBC5-49EE-49DA-94A4-8FCA885689F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
