@@ -23,16 +23,15 @@ steps:
     zipAfterPublish: True
 
 - powershell: |
-    Write-Host $PSScriptRoot
-    $websiteDirectory = "$(Build.SourcesDirectory)/src/Rates.Web/wwwroot"
-    Copy-Item "$websiteDirectory/settings.prod.js" "$websiteDirectory/settings.js" -Force
+    $websiteDirectory = "$(Build.SourcesDirectory)\src\Rates.Web\wwwroot"
+    Copy-Item "$websiteDirectory\settings.prod.js" "$websiteDirectory\settings.js" -Force
   displayName: 'Update javascript settings'
 
 - task: CopyFiles@2
   displayName: 'Copy website files to artifacts'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/src/Rates.Web/wwwroot'
-    Contents: '**/wwwroot/**/*'
+    Contents: '**/*'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
 
 - task: PublishBuildArtifacts@1
