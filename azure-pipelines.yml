@@ -23,8 +23,8 @@ steps:
     zipAfterPublish: True
 
 - powershell: |
-    $websiteDirectory = ".\src\Rates.Web\wwwroot"
-    Copy-Item "$websiteDirectory\settings.prod.js" "$websiteDirectory\settings.js" -Force
+    $websiteDirectory = "./src/Rates.Web/wwwroot"
+    Copy-Item "$websiteDirectory/settings.prod.js" "$websiteDirectory/settings.js" -Force
   displayName: 'Update javascript settings'
 
 - task: CopyFiles@2
