@@ -22,10 +22,15 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
+- powershell: |
+    $websiteDirectory = ".\src\Rates.Web\wwwroot"
+    Copy-Item "$websiteDirectory\settings.prod.js" "$websiteDirectory\settings.js" -Force
+  displayName: 'Update javascript settings'
+
 - task: CopyFiles@2
-  displayName: 'Copy website files to: $(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy website files to artifacts'
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
+    SourceFolder: '$(Build.SourcesDirectory)/src/Rates.Web/wwwroot'
     Contents: '**/wwwroot/**/*'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
 
