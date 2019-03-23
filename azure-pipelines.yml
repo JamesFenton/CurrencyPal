@@ -23,6 +23,7 @@ steps:
     zipAfterPublish: True
 
 - powershell: |
+    Write-Host $PSScriptRoot
     $websiteDirectory = "./src/Rates.Web/wwwroot"
     Copy-Item "$websiteDirectory/settings.prod.js" "$websiteDirectory/settings.js" -Force
   displayName: 'Update javascript settings'
