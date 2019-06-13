@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
   
@@ -13,10 +13,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -24,10 +20,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   
 </Project>
