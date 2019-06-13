@@ -11,5 +11,6 @@ namespace Rates.Functions
         public string DatabaseConnectionString { get; set; }
         public string CoinMarketCapApiKey { get; set; }
         public string OpenExchangeRatesApiKey { get; set; }
+        public string IexApiKey { get; set; }
     }
 }

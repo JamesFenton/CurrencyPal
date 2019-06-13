@@ -2,7 +2,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,10 +12,15 @@ namespace Rates.Functions.ReadModel
 {
     public class RateAddedHandler
     {
-        private static Database _database = ContainerFactory.Container.Resolve<Database>();
+        private readonly Database _database;
+
+        public RateAddedHandler(Database database)
+        {
+            _database = database;
+        }
 
         [FunctionName("RateAddedHandler")]
-        public static async Task Run(
+        public async Task Run(
             [QueueTrigger(Constants.RatesAddedQueue)]string myQueueItem,
             ILogger log)
         {
@@ -53,7 +57,7 @@ namespace Rates.Functions.ReadModel
             log.LogInformation($"Rate {rate.Ticker} {rate.TimeKey} handled successfully");
         }
 
-        private static async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
+        private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)
         {
             var operation = TableOperation.Retrieve<RateEntity>(ticker, time.ToString("o"));
             var tableResult = await _database.Rates.ExecuteAsync(operation);
@@ -63,7 +67,7 @@ namespace Rates.Functions.ReadModel
             return GetChangePercent(rateNow, rateThen);
         }
 
-        private static double? GetChangePercent(double rateNow, double? rateThen)
+        private double? GetChangePercent(double rateNow, double? rateThen)
         {
             if (!rateThen.HasValue)
                 return null;

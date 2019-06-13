@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Polly.Retry;
 using Rates.Functions.WriteModel;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Rates.Functions.Services
     public class CoinMarketCapService : IRatesService
     {
         private readonly HttpClient _http = new HttpClient();
+        private readonly RetryPolicy _retryPolicy;
 
         public Rate[] Rates => new[]
         {
@@ -23,12 +25,18 @@ namespace Rates.Functions.Services
             Rate.XLMUSD,
         };
 
-        public CoinMarketCapService(Settings settings)
+        public CoinMarketCapService(Settings settings, RetryPolicy retryPolicy)
         {
             _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", settings.CoinMarketCapApiKey);
+            _retryPolicy = retryPolicy;
         }
-        
-        public async Task<IEnumerable<RateEntity>> GetRates()
+
+        public Task<IEnumerable<RateEntity>> GetRates()
+        {
+            return _retryPolicy.ExecuteAsync(() => Get());
+        }
+
+        private async Task<IEnumerable<RateEntity>> Get()
         {
             var symbols = Rates.ToDictionary(t => t, t => GetCoinMarketCapSymbol(t.Ticker));
             var symbolsQueryString = string.Join(",", symbols.Values);

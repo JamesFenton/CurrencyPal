@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -16,10 +15,15 @@ namespace Rates.Functions.ReadModel
 {
     public class GetRates
     {
-        private static Database _database = ContainerFactory.Container.Resolve<Database>();
+        private readonly Database _database;
+
+        public GetRates(Database database)
+        {
+            _database = database;
+        }
 
         [FunctionName("GetRates")]
-        public static async Task<HttpResponseMessage> Run(
+        public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")]HttpRequestMessage req,
             ILogger log)
         {
