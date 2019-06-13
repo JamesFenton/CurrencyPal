@@ -21,6 +21,7 @@ namespace Rates.Functions
                 DatabaseConnectionString = Environment.GetEnvironmentVariable("RATES_DB_CONNECTIONSTRING"),
                 CoinMarketCapApiKey = Environment.GetEnvironmentVariable("CMC_API_KEY"),
                 OpenExchangeRatesApiKey = Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID"),
+                IexApiKey = Environment.GetEnvironmentVariable("IEX_TOKEN"),
             };
 
             services.AddSingleton(settings);
