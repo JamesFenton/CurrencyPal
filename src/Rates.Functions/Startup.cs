@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+[assembly: FunctionsStartup(typeof(Rates.Functions.Startup))]
+
 namespace Rates.Functions
 {
     public class Startup : FunctionsStartup
