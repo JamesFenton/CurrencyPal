@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Rates.Functions.WriteModel;
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
 
 namespace Rates.Functions.ReadModel
 {
@@ -21,12 +23,14 @@ namespace Rates.Functions.ReadModel
 
         [FunctionName("RateAddedHandler")]
         public async Task Run(
-            [QueueTrigger(Constants.RatesAddedQueue)]string myQueueItem,
+            [QueueTrigger(Constants.RatesAddedQueue)] string myQueueItem,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
             ILogger log)
         {
             var rate = JsonConvert.DeserializeObject<RateEntity>(myQueueItem);
 
-            var rateModel = Rate.All.Single(r => r.Ticker == rate.Ticker);
+            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
+            var rateModel = rateLookups.Single(r => r.Ticker == rate.Ticker);
             var timeAdded = DateTimeOffset.Parse(rate.TimeKey);
 
             // calculate changes

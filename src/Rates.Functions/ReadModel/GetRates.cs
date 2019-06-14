@@ -10,6 +10,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Net;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace Rates.Functions.ReadModel
 {
@@ -24,7 +26,8 @@ namespace Rates.Functions.ReadModel
 
         [FunctionName("GetRates")]
         public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")]HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")] HttpRequestMessage req,
+            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateLookupsJson,
             ILogger log)
         {
             // get all rates
@@ -33,7 +36,8 @@ namespace Rates.Functions.ReadModel
             var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
             // create the ordered DTOs
-            var orderedRates = Rate.All
+            //var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
+            var orderedRates = rateLookupsJson
                 .Select(rate => rates.FirstOrDefault(r => r.Ticker == rate.Ticker))
                 .Where(r => r != null)
                 .ToList();
