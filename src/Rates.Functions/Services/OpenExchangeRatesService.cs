@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Polly.Retry;
 using Rates.Functions.WriteModel;
 using System;
 using System.Collections.Generic;
@@ -11,39 +10,22 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.Services
 {
-    public class OpenExchangeRatesService : IRatesService
+    public class OpenExchangeRatesService
     {
         private readonly HttpClient _http = new HttpClient();
-        private readonly RetryPolicy _retryPolicy;
 
-        public Rate[] Rates => new[]
-        {
-            Rate.USDZAR,
-            Rate.GBPZAR,
-            Rate.EURZAR,
-            Rate.ZARMUR,
-            Rate.XAUUSD,
-            Rate.XAGUSD,
-        };
-
-        public OpenExchangeRatesService(Settings settings, RetryPolicy retryPolicy)
+        public OpenExchangeRatesService(Settings settings)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", settings.OpenExchangeRatesApiKey);
-            _retryPolicy = retryPolicy;
         }
 
-        public Task<IEnumerable<RateEntity>> GetRates()
-        {
-            return _retryPolicy.ExecuteAsync(() => Get());
-        }
-
-        private async Task<IEnumerable<RateEntity>> Get()
+        public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
             var json = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
             var sourceRates = JObject.Parse(json)["rates"] as JObject;
 
-            var rates = Rates.Select(t => ConvertRate(t));
-            return rates;
+            var values = rates.Select(t => ConvertRate(t));
+            return values;
 
             RateEntity ConvertRate(Rate rate)
             {

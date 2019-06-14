@@ -27,7 +27,7 @@ namespace Rates.Functions.ReadModel
         [FunctionName("GetRates")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")] HttpRequestMessage req,
-            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateLookupsJson,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
             ILogger log)
         {
             // get all rates
@@ -36,8 +36,7 @@ namespace Rates.Functions.ReadModel
             var rates = await _database.RatesRm.ExecuteQuerySegmentedAsync(query, continuationToken);
 
             // create the ordered DTOs
-            //var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
-            var orderedRates = rateLookupsJson
+            var orderedRates = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
                 .Select(rate => rates.FirstOrDefault(r => r.Ticker == rate.Ticker))
                 .Where(r => r != null)
                 .ToList();
