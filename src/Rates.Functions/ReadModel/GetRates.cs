@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Rates.Functions.ReadModel
 {
@@ -25,8 +25,8 @@ namespace Rates.Functions.ReadModel
         }
 
         [FunctionName("GetRates")]
-        public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")] HttpRequestMessage req,
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates")] HttpRequest req,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
             ILogger log)
         {
@@ -46,12 +46,11 @@ namespace Rates.Functions.ReadModel
             var updateTime = orderedRates.Max(r => r.Timestamp).ToUnixTimeMilliseconds();
 
             // create response
-            var response = new
+            return new OkObjectResult(new
             {
                 rates = orderedRates,
                 updateTime = updateTime
-            };
-            return req.CreateResponse(HttpStatusCode.OK, response, Constants.JsonFormatter);
+            });
         }
     }
 }
