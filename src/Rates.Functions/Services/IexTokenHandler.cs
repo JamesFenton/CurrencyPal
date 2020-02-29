@@ -19,7 +19,7 @@ namespace Rates.Functions.Services
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             // add token to query string
-            request.RequestUri = new Uri(request.RequestUri.ToString() + $"token={_token}");
+            request.RequestUri = new Uri(request.RequestUri.ToString() + $"?token={_token}");
             return base.SendAsync(request, cancellationToken);
         }
     }
