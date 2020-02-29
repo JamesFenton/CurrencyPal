@@ -30,6 +30,8 @@ namespace Rates.Functions.ReadModel
             [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
             ILogger log)
         {
+            log.LogInformation("Executing GetRates");
+
             // get all rates
             TableContinuationToken continuationToken = null;
             var query = new TableQuery<RateRm>();
