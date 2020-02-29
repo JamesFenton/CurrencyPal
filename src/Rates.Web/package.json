@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cp -R wwwroot/ public/",
+    "build": "cp settings.prod.js settings.js",
     "dev": "http-server"
   },
   "author": "",
