@@ -9,18 +9,19 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Rates.Functions.WriteModel
 {
     public class FetchStocks
     {
         private readonly IexService _iexService;
-        private readonly RateSaver _rateSaver;
+        private readonly Database _database;
 
-        public FetchStocks(IexService iexService, RateSaver rateSaver)
+        public FetchStocks(IexService iexService, Database database)
         {
             _iexService = iexService;
-            _rateSaver = rateSaver;
+            _database = database;
         }
 
         [FunctionName("FetchStocks")]
@@ -33,7 +34,12 @@ namespace Rates.Functions.WriteModel
             var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
                 .Where(r => r.Source == RateSource.Iex);
             var rates = await _iexService.GetRates(rateLookups);
-            await _rateSaver.Save(rates);
+
+            await Task.WhenAll(rates.Select(rate =>
+            {
+                var operation = TableOperation.InsertOrReplace(rate);
+                return _database.Rates.ExecuteAsync(operation);
+            }));
 
             log.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
             foreach (var rate in rates)

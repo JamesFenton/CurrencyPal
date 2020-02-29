@@ -15,9 +15,9 @@ namespace Rates.Functions
 
         public CloudTable RatesRm { get; }
 
-        public Database(Settings settings)
+        public Database(string connectionString)
         {
-            var storageAccount = CloudStorageAccount.Parse(settings.DatabaseConnectionString);
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
             _client = storageAccount.CreateCloudTableClient();
 
             Rates = _client.GetTableReference("rates");

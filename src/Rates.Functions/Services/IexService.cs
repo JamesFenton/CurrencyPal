@@ -10,15 +10,11 @@ namespace Rates.Functions.Services
 {
     public class IexService
     {
-        private readonly HttpClient _http = new HttpClient
-        {
-            BaseAddress = new Uri("https://cloud.iexapis.com")
-        };
-        private readonly string _token;
+        private readonly HttpClient _http;
 
-        public IexService(Settings settings)
+        public IexService(HttpClient http)
         {
-            _token = settings.IexApiKey;
+            _http = http;
         }
         
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
@@ -29,7 +25,7 @@ namespace Rates.Functions.Services
         private async Task<RateEntity> GetRate(Rate rate)
         {
             var iexSymbol = rate.SourceSymbol;
-            var url = $"/v1/stock/{iexSymbol}/quote/latestPrice?token={_token}";
+            var url = $"/v1/stock/{iexSymbol}/quote/latestPrice";
             var response = await _http.GetStringAsync(url);
             var value = double.Parse(response);
             return new RateEntity(rate.Ticker, DateTimeOffset.UtcNow, value);

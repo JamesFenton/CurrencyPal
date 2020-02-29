@@ -9,18 +9,19 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Rates.Functions.WriteModel
 {
     public class FetchForex
     {
         private readonly OpenExchangeRatesService _openExchangeRatesService;
-        private readonly RateSaver _rateSaver;
+        private readonly Database _database;
 
-        public FetchForex(OpenExchangeRatesService openExchangeRatesService, RateSaver rateSaver)
+        public FetchForex(OpenExchangeRatesService openExchangeRatesService, Database database)
         {
             _openExchangeRatesService = openExchangeRatesService;
-            _rateSaver = rateSaver;
+            _database = database;
         }
 
         [FunctionName("FetchForex")]
@@ -33,7 +34,12 @@ namespace Rates.Functions.WriteModel
             var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
                 .Where(r => r.Source == RateSource.OpenExchangeRates);
             var rates = await _openExchangeRatesService.GetRates(rateLookups);
-            await _rateSaver.Save(rates);
+
+            await Task.WhenAll(rates.Select(rate =>
+            {
+                var operation = TableOperation.InsertOrReplace(rate);
+                return _database.Rates.ExecuteAsync(operation);
+            }));
 
             log.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
             foreach (var rate in rates)

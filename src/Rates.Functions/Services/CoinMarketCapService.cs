@@ -11,18 +11,18 @@ namespace Rates.Functions.Services
 {
     public class CoinMarketCapService
     {
-        private readonly HttpClient _http = new HttpClient();
+        private readonly HttpClient _http;
 
-        public CoinMarketCapService(Settings settings)
+        public CoinMarketCapService(HttpClient http)
         {
-            _http.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", settings.CoinMarketCapApiKey);
+            _http = http;
         }
 
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
             var queryString = string.Join(",", rates.Select(r => r.SourceSymbol));
 
-            var url = $"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={queryString}";
+            var url = $"/v1/cryptocurrency/quotes/latest?symbol={queryString}";
             var json = await _http.GetStringAsync(url);
             var response = JObject.Parse(json);
 

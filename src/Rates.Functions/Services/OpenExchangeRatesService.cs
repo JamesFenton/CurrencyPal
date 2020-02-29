@@ -12,16 +12,16 @@ namespace Rates.Functions.Services
 {
     public class OpenExchangeRatesService
     {
-        private readonly HttpClient _http = new HttpClient();
+        private readonly HttpClient _http;
 
-        public OpenExchangeRatesService(Settings settings)
+        public OpenExchangeRatesService(HttpClient http)
         {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", settings.OpenExchangeRatesApiKey);
+            _http = http;
         }
 
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
-            var json = await _http.GetStringAsync("https://openexchangerates.org/api/latest.json");
+            var json = await _http.GetStringAsync("/api/latest.json");
             var sourceRates = JObject.Parse(json)["rates"] as JObject;
 
             var values = rates.Select(t => ConvertRate(t));
