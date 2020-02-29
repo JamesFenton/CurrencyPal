@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "rates.web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cp -R wwwroot/ public/",
+    "dev": "http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^0.12.1"
+  }
+}

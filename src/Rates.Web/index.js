@@ -1,4 +1,6 @@
-import RatesService from "./rates-service.js";
+import {RatesService} from "./rates-service.js";
+
+const ratesService = new RatesService();
 
 var app = new Vue({
     el: '#app',
@@ -15,7 +17,7 @@ var app = new Vue({
         getRates: function () {
             this.requesting = true;
             this.errorMessage = null;
-            RatesService.getRates()
+            ratesService.getRates()
                 .then(dto => {
                     this.requesting = false;
 

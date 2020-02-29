@@ -1,12 +1,6 @@
 ﻿import settings from "./settings.js";
 
 export class RatesService {
-    
-    constructor() {
-        this.ratesUrl = settings.devMode
-            ? "/example-rates.json"
-            : "https://ratesfenton.azurewebsites.net/api/rates";
-    }
 
     getRates() {
         const isOutOfDate = (timestamp) => {
@@ -14,7 +8,7 @@ export class RatesService {
             return new Date(timestamp) < oneHourAgo;
         };
 
-        return fetch(this.ratesUrl)
+        return fetch(settings.ratesUrl)
             .then(res => res.json())
             .then(res => {
                 res.rates.forEach(r => r.outOfDate = isOutOfDate(r.timestamp));
@@ -22,5 +16,3 @@ export class RatesService {
             });
     }
 }
-
-export default new RatesService();
