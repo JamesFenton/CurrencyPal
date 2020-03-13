@@ -10,17 +10,22 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.WindowsAzure.Storage.Table;
+using Rates.Functions.ReadModel;
 
 namespace Rates.Functions.WriteModel
 {
-    public class FetchCryptos
+    public class FetchSaveRates
     {
-        private readonly CoinMarketCapService _coinMarketCapService;
         private readonly Database _database;
+        private readonly IEnumerable<IRatesService> _ratesServices;
 
-        public FetchCryptos(CoinMarketCapService coinMarketCapService, Database database)
+        public FetchSaveRates(
+            IEnumerable<IRatesService> ratesServices, 
+            Database database,
+            RateAddedHandler rateAddedHandler
+        )
         {
-            _coinMarketCapService = coinMarketCapService;
+            _ratesServices = ratesServices;
             _database = database;
         }
 
@@ -31,22 +36,26 @@ namespace Rates.Functions.WriteModel
             [Queue(Constants.RatesAddedQueue)] ICollector<string> destinationQueue,
             ILogger log)
         {
-            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
-                .Where(r => r.Source == RateSource.CoinMarketCap);
-            var rates = await _coinMarketCapService.GetRates(rateLookups);
+            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
 
+            // get rates
+            log.LogInformation($"Getting {rateLookups.Count()} rates");
+            var rates = (await Task.WhenAll(
+                _ratesServices.Select(s => s.GetRates(rateLookups))
+            )).SelectMany(r => r);
+
+            // save to storage
+            log.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
             await Task.WhenAll(rates.Select(rate =>
             {
                 var operation = TableOperation.InsertOrReplace(rate);
                 return _database.Rates.ExecuteAsync(operation);
             }));
 
+            // send queue message
             log.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
-            foreach (var rate in rates)
-            {
-                var json = JsonConvert.SerializeObject(rate);
-                destinationQueue.Add(json);
-            }
+            var message = JsonConvert.SerializeObject(rates);
+            destinationQueue.Add(message);
         }
     }
 }

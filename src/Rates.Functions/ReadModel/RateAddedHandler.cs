@@ -15,22 +15,54 @@ namespace Rates.Functions.ReadModel
     public class RateAddedHandler
     {
         private readonly Database _database;
+        private readonly JsonSerializer _jsonSerializer;
 
-        public RateAddedHandler(Database database)
+        public RateAddedHandler(Database database, JsonSerializer jsonSerializer)
         {
             _database = database;
+            _jsonSerializer = jsonSerializer;
         }
 
         [FunctionName("RateAddedHandler")]
         public async Task Run(
             [QueueTrigger(Constants.RatesAddedQueue)] string myQueueItem,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
+            [Blob("read-model/rates.json", FileAccess.Write)] TextWriter ratesBlob,
             ILogger log)
         {
-            var rate = JsonConvert.DeserializeObject<RateEntity>(myQueueItem);
+            var rates = JsonConvert.DeserializeObject<List<RateEntity>>(myQueueItem);
+            var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
 
-            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
-            var rateModel = rateLookups.Single(r => r.Ticker == rate.Ticker);
+            log.LogInformation($"Handling {rates.Count} new rates");
+
+            // create read model entities
+            var readModelEntities = await Task.WhenAll(
+                rates.Select(r => (rate: r, definition: rateDefinitions.Single(l => l.Ticker == r.Ticker)))
+                     .Select(x => GetReadModelEntity(x.rate, x.definition))
+            );
+
+            log.LogInformation("Created read model entities");
+
+            // order and create DTO
+            var orderedRates = rateDefinitions
+                .Select(rate => readModelEntities.FirstOrDefault(r => r.Ticker == rate.Ticker))
+                .Where(r => r != null)
+                .ToList();
+
+            var updateTime = orderedRates.Max(r => r.Timestamp).ToUnixTimeMilliseconds();
+
+            var dto = new GetRatesDto
+            {
+                Rates = orderedRates,
+                UpdateTime = updateTime,
+            };
+
+            // save dto to storage
+            _jsonSerializer.Serialize(ratesBlob, dto);
+        }
+
+        private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition)
+        {
             var timeAdded = DateTimeOffset.Parse(rate.TimeKey);
 
             // calculate changes
@@ -41,24 +73,19 @@ namespace Rates.Functions.ReadModel
             var sixMonthChange = await GetRateChange(rate.Ticker, timeAdded.AddMonths(-6), rate.Value);
             var oneYearChange = await GetRateChange(rate.Ticker, timeAdded.AddYears(-1), rate.Value);
 
-            // Update the read model entry
-            var updatedRate = new RateRm(
+            // return the read model entry
+            return new RateRm(
                 ticker: rate.Ticker,
-                name: rateModel.Name,
-                href: rateModel.Href,
+                name: rateDefinition.Name,
+                href: rateDefinition.Href,
                 value: rate.Value,
                 change1Day: oneDayChange,
                 change1Week: oneWeekChange,
                 change1Month: oneMonthChange,
                 change3Months: threeMonthChange,
                 change6Months: sixMonthChange,
-                change1Year: oneYearChange);
-
-            // update read model entry
-            var insertOrReplaceOperation = TableOperation.InsertOrReplace(updatedRate);
-            await _database.RatesRm.ExecuteAsync(insertOrReplaceOperation);
-
-            log.LogInformation($"Rate {rate.Ticker} {rate.TimeKey} handled successfully");
+                change1Year: oneYearChange
+            );
         }
 
         private async Task<double?> GetRateChange(string ticker, DateTimeOffset time, double rateNow)

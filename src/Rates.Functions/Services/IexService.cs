@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.Services
 {
-    public class IexService
+    public class IexService : IRatesService
     {
         private readonly HttpClient _http;
 
@@ -19,7 +19,8 @@ namespace Rates.Functions.Services
         
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
-            return await Task.WhenAll(rates.Select(GetRate));
+            var ratesToFetch = rates.Where(r => r.Source == RateSource.Iex);
+            return await Task.WhenAll(ratesToFetch.Select(GetRate));
         }
 
         private async Task<RateEntity> GetRate(Rate rate)

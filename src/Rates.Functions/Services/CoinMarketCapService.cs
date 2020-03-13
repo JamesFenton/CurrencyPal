@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.Services
 {
-    public class CoinMarketCapService
+    public class CoinMarketCapService : IRatesService
     {
         private readonly HttpClient _http;
 
@@ -20,13 +20,15 @@ namespace Rates.Functions.Services
 
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
-            var queryString = string.Join(",", rates.Select(r => r.SourceSymbol));
+            var ratesToFetch = rates.Where(r => r.Source == RateSource.CoinMarketCap);
+
+            var queryString = string.Join(",", ratesToFetch.Select(r => r.SourceSymbol));
 
             var url = $"/v1/cryptocurrency/quotes/latest?symbol={queryString}";
             var json = await _http.GetStringAsync(url);
             var response = JObject.Parse(json);
 
-            var values = rates.Select(s =>
+            var values = ratesToFetch.Select(s =>
             {
                 var ticker = s.Ticker;
                 var coinMarketCapSymbol = s.SourceSymbol;

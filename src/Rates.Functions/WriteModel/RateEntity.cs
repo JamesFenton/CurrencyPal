@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Rates.Functions.WriteModel
 {
+    /// <summary>
+    /// The value of a rate at a certain point in time
+    /// </summary>
     public class RateEntity : TableEntity
     {
         /// <summary>

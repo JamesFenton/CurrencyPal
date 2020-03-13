@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.Services
 {
-    public class OpenExchangeRatesService
+    public class OpenExchangeRatesService : IRatesService
     {
         private readonly HttpClient _http;
 
@@ -21,10 +21,12 @@ namespace Rates.Functions.Services
 
         public async Task<IEnumerable<RateEntity>> GetRates(IEnumerable<Rate> rates)
         {
+            var ratesToFetch = rates.Where(r => r.Source == RateSource.OpenExchangeRates);
+
             var json = await _http.GetStringAsync("/api/latest.json");
             var sourceRates = JObject.Parse(json)["rates"] as JObject;
 
-            var values = rates.Select(t => ConvertRate(t));
+            var values = ratesToFetch.Select(t => ConvertRate(t));
             return values;
 
             RateEntity ConvertRate(Rate rate)
