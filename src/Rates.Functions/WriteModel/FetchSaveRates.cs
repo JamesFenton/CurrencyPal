@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.WindowsAzure.Storage.Table;
-using Rates.Functions.ReadModel;
 
 namespace Rates.Functions.WriteModel
 {
@@ -21,15 +20,14 @@ namespace Rates.Functions.WriteModel
 
         public FetchSaveRates(
             IEnumerable<IRatesService> ratesServices, 
-            Database database,
-            RateAddedHandler rateAddedHandler
+            Database database
         )
         {
             _ratesServices = ratesServices;
             _database = database;
         }
 
-        [FunctionName("FetchCryptos")]
+        [FunctionName("FetchSaveRates")]
         public async Task Run(
             [TimerTrigger("0 0 * * * *")]TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
