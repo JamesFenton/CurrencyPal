@@ -1,4 +1,4 @@
-import {RatesService} from "./rates-service";
+import {RatesService} from "./rates-service.js";
 
 const ratesService = new RatesService();
 
