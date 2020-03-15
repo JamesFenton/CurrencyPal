@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Polly;
 using Rates.Functions.Services;
-using Rates.Functions.WriteModel;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
@@ -24,7 +23,8 @@ namespace Rates.Functions
 
             services.AddSingleton(new JsonSerializer
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.Indented,
             });
 
             // external services

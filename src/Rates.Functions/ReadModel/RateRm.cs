@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.ReadModel
 {
-    public class RateRm : TableEntity
+    public class RateRm
     {
-        public const string PartitionKeyLabel = "readmodel";
-
-        public string Ticker => RowKey;
+        public string Ticker { get; set; }
         public string Name { get; set; }
         public string Href { get; set; }
         public double Value { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
 
         public double? Change1Day { get; set; }
         public double? Change1Week { get; set; }
@@ -35,13 +34,14 @@ namespace Rates.Functions.ReadModel
             double? change1Month,
             double? change3Months,
             double? change6Months,
-            double? change1Year)
+            double? change1Year
+        )
         {
-            PartitionKey = PartitionKeyLabel;
-            RowKey = ticker;
+            Ticker = ticker;
             Name = name;
             Href = href;
             Value = value;
+            Timestamp = DateTimeOffset.UtcNow;
             Change1Day = change1Day;
             Change1Week = change1Week;
             Change1Month = change1Month;
