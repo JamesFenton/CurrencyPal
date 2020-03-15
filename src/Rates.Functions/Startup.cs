@@ -35,28 +35,29 @@ namespace Rates.Functions
                 TimeSpan.FromSeconds(10),
             };
 
-            services.AddHttpClient<CoinMarketCapService>(client =>
+            // coinmarketcap
+            services.AddHttpClient<IRatesService, CoinMarketCapService>(client =>
             {
                 client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
                 client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", Environment.GetEnvironmentVariable("CMC_API_KEY"));
             })
             .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(retryTimeouts));
 
-            services.AddHttpClient<IexService>(client =>
+            // IEX
+            services.AddHttpClient<IRatesService, IexService>(client =>
             {
                 client.BaseAddress = new Uri("https://cloud.iexapis.com");
             })
             .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(retryTimeouts))
             .AddHttpMessageHandler(c => new IexTokenHandler(Environment.GetEnvironmentVariable("IEX_TOKEN")));
 
-            services.AddHttpClient<OpenExchangeRatesService>(client =>
+            // open exchange rates
+            services.AddHttpClient<IRatesService, OpenExchangeRatesService>(client =>
             {
                 client.BaseAddress = new Uri("https://openexchangerates.org");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", Environment.GetEnvironmentVariable("OPENEXCHANGERATES_APPID"));
             })
             .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(retryTimeouts));
-
-
         }
     }
 }

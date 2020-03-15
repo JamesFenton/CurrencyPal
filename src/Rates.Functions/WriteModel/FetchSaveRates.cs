@@ -37,10 +37,12 @@ namespace Rates.Functions.WriteModel
             var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
 
             // get rates
-            log.LogInformation($"Getting {rateLookups.Count()} rates");
+            log.LogInformation($"Getting {rateLookups.Count()} rates from {_ratesServices.Count()} services");
             var rates = (await Task.WhenAll(
                 _ratesServices.Select(s => s.GetRates(rateLookups))
-            )).SelectMany(r => r);
+            ))
+            .SelectMany(r => r)
+            .ToList();
 
             // save to storage
             log.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
