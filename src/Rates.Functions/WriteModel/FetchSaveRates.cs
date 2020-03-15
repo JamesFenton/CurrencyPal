@@ -19,12 +19,19 @@ namespace Rates.Functions.WriteModel
         private readonly IEnumerable<IRatesService> _ratesServices;
 
         public FetchSaveRates(
-            IEnumerable<IRatesService> ratesServices, 
-            Database database
+            Database database,
+            CoinMarketCapService coinMarketCapService,
+            IexService iexService,
+            OpenExchangeRatesService openExchangeRatesService
         )
         {
-            _ratesServices = ratesServices;
             _database = database;
+            _ratesServices = new IRatesService[] 
+            {
+                coinMarketCapService,
+                iexService,
+                openExchangeRatesService
+            };
         }
 
         [FunctionName("FetchSaveRates")]
