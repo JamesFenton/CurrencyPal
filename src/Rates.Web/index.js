@@ -22,7 +22,10 @@ var app = new Vue({
                     this.requesting = false;
 
                     this.rates = dto.rates;
-                    this.updateTimeMessage = "Last updated at " + new Date(dto.updateTime).toLocaleTimeString();
+
+                    this.rates.forEach(r => 
+                        r.updateTimeMessage = r.outOfDate ? "Last updated at " + new Date(r.timestamp) : null
+                    );
                 })
                 .catch(error => {
                     var response = error.response.data;
