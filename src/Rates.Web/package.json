@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "cp settings.prod.js settings.js",
-    "dev": "http-server"
+    "dev": "http-server ."
   },
   "author": "",
   "license": "ISC",
