@@ -1,18 +1,26 @@
 ﻿import settings from "./settings.js";
+import exampleRates from "./example-rates.json";
 
-export class RatesService {
+class RatesService {
 
     getRates() {
-        const isOutOfDate = (timestamp) => {
-            const oneHourAgo = new Date(new Date() - 1000 * 60 * 60);
-            return new Date(timestamp) < oneHourAgo;
-        };
+        const fetchExampleRates = () => {
+            if (settings.useExampleRates) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => resolve(exampleRates), 2000);
+                });
+            }
+        }
 
-        return fetch(settings.ratesUrl)
-            .then(res => res.json())
-            .then(res => {
-                res.rates.forEach(r => r.outOfDate = isOutOfDate(r.timestamp));
-                return res;
-            });
+        const fetchRates = () => {
+            return fetch(settings.ratesUrl)
+                .then(res => res.json());
+        }
+
+        return settings.useExampleRates
+            ? fetchExampleRates()
+            : fetchRates();
     }
 }
+
+export default new RatesService();

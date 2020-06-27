@@ -1,3 +1,4 @@
 ﻿export default {
-    ratesUrl: "/example-rates.json"
+    useExampleRates: true,
+    ratesUrl: ""
 }

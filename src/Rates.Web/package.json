@@ -5,12 +5,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cp settings.prod.js settings.js",
-    "dev": "http-server ."
+    "build": "cp settings.prod.js settings.js && parcel build index.html",
+    "dev": "parcel index.html"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^0.12.1"
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "bootstrap": "^4.5.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   }
 }

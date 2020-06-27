@@ -5,13 +5,6 @@
     <title>Exchange Rates</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/site.css" >
-
-    <script src="js/vue.js"></script>
-
-    <script src="index.js" type="module"></script>
-
     <script type="text/javascript">
         var sdkInstance="appInsightsSDK";window[sdkInstance]="appInsights";var aiName=window[sdkInstance],aisdk=window[aiName]||function(e){function n(e){t[e]=function(){var n=arguments;t.queue.push(function(){t[e].apply(t,n)})}}var t={config:e};t.initialize=!0;var i=document,a=window;setTimeout(function(){var n=i.createElement("script");n.src=e.url||"https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js",i.getElementsByTagName("script")[0].parentNode.appendChild(n)});try{t.cookie=i.cookie}catch(e){}t.queue=[],t.version=2;for(var r=["Event","PageView","Exception","Trace","DependencyData","Metric","PageViewPerformance"];r.length;)n("track"+r.pop());n("startTrackPage"),n("stopTrackPage");var s="Track"+r[0];if(n("start"+s),n("stop"+s),n("setAuthenticatedUserContext"),n("clearAuthenticatedUserContext"),n("flush"),!(!0===e.disableExceptionTracking||e.extensionConfig&&e.extensionConfig.ApplicationInsightsAnalytics&&!0===e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)){n("_"+(r="onerror"));var o=a[r];a[r]=function(e,n,i,a,s){var c=o&&o(e,n,i,a,s);return!0!==c&&t["_"+r]({message:e,url:n,lineNumber:i,columnNumber:a,error:s}),c},e.autoExceptionInstrumented=!0}return t}(
         {
@@ -20,81 +13,8 @@
         );window[aiName]=aisdk,aisdk.queue&&0===aisdk.queue.length&&aisdk.trackPageView({});
      </script>
 </head>
-
-  <body>
-
-    <div class="container" id="app" hidden>
-        <div class="row">
-            <div class="col-md-3"></div>
-
-            <div class="col-md-6">
-                <div class="alert alert-danger" role="alert" v-show="errorMessage">
-                    {{errorMessage}}
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">Exchange Rates</h5>
-                      
-                      <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th scope="col">Ticker</th>
-                                <th scope="col">Rate</th>
-                                <th scope="col">1d</th>
-                                <th>
-                                    <select class="form-control form-control-sm" v-model="changePeriod">
-                                        <option>1w</option>
-                                        <option>1m</option>
-                                        <option>3m</option>
-                                        <option>6m</option>
-                                        <option>1y</option>
-                                    </select>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="rate in rates">
-                                <td v-bind:class="{ 'table-danger': rate.outOfDate }"
-                                    v-bind:title="rate.updateTimeMessage">
-                                    <a v-if="rate.href" v-bind:href="rate.href" target="_blank">{{rate.name}}</a>
-                                    <span v-if="!rate.href">{{rate.name}}</span>
-                                </td>
-                                <td>{{rate.value | round}}</td>
-                                <td v-bind:class="[rate.change1Day > 0 ? 'positive-change' : '', rate.change1Day < 0 ? 'negative-change' : '']">
-                                    {{rate.change1Day | roundedPercentage}}
-                                </td>
-                                <td v-if="changePeriod === '1w'" v-bind:class="[rate.change1Week > 0 ? 'positive-change' : '', rate.change1Week < 0 ? 'negative-change' : '']">
-                                    {{rate.change1Week | roundedPercentage}}
-                                </td>
-                                <td v-if="changePeriod === '1m'" v-bind:class="[rate.change1Month > 0 ? 'positive-change' : '', rate.change1Month < 0 ? 'negative-change' : '']">
-                                    {{rate.change1Month | roundedPercentage}}
-                                </td>
-                                <td v-if="changePeriod === '3m'" v-bind:class="[rate.change3Months > 0 ? 'positive-change' : '', rate.change3Months < 0 ? 'negative-change' : '']">
-                                    {{rate.change3Months | roundedPercentage}}
-                                </td>
-                                <td v-if="changePeriod === '6m'" v-bind:class="[rate.change6Months > 0 ? 'positive-change' : '', rate.change6Months < 0 ? 'negative-change' : '']">
-                                    {{rate.change6Months | roundedPercentage}}
-                                </td>
-                                <td v-if="changePeriod === '1y'" v-bind:class="[rate.change1Year > 0 ? 'positive-change' : '', rate.change1Year < 0 ? 'negative-change' : '']">
-                                    {{rate.change1Year | roundedPercentage}}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <button class="btn btn-primary" 
-                    v-on:click="getRates"
-                    v-bind:disabled="requesting">
-                        {{requesting ? 'Updating...' : 'Update'}}
-                    </button>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3"></div>
-        </div>
-    </div>
-  </body>
+<body>
+    <div id="app"></div>
+    <script src="./index.js"></script>
+</body>
 </html>
