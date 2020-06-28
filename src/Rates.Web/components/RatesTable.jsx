@@ -3,17 +3,11 @@ import RatesRow from "./RatesRow";
 import ratesService from "../rates-service";
 
 class RatesTable extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            rates: [],
-            selectedTimePeriod: window.localStorage.getItem("changePeriod") || '1w',
-            requesting: false
-        };
-
-        this.update = this.update.bind(this);
-        this.changePeriod = this.changeSelectedTimePeriod.bind(this);
-    }
+    state = {
+        rates: [],
+        selectedTimePeriod: window.localStorage.getItem("changePeriod") || '1w',
+        requesting: false
+    };
 
     componentDidMount() {
         this.getRates();
@@ -33,13 +27,13 @@ class RatesTable extends Component {
             })
     }
 
-    update() {
-        this.getRates();
-    }
-
-    changeSelectedTimePeriod(e) {
+    changeSelectedTimePeriod = (e) => {
         this.setState({selectedTimePeriod: e.target.value});
         window.localStorage.setItem("changePeriod", this.state.selectedTimePeriod);
+    }
+
+    update = () => {
+        this.getRates();
     }
 
     render() {
