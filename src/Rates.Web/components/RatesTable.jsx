@@ -37,6 +37,8 @@ class RatesTable extends Component {
     }
 
     render() {
+        const timePeriodOptions = ['1w', '1m', '3m', '6m', '1y'];
+
         return (
             <div className="card">
                 <div className="card-body">
@@ -50,11 +52,11 @@ class RatesTable extends Component {
                             <th scope="col">1d</th>
                             <th>
                                 <select className="form-control form-control-sm" onChange={this.changeSelectedTimePeriod}>
-                                    <option>1w</option>
-                                    <option>1m</option>
-                                    <option>3m</option>
-                                    <option>6m</option>
-                                    <option>1y</option>
+                                    {timePeriodOptions.map(o => 
+                                        <option selected={o === this.state.selectedTimePeriod}>
+                                            {o}
+                                        </option>    
+                                    )}
                                 </select>
                             </th>
                         </tr>
