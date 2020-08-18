@@ -1,23 +1,18 @@
-import React, {Component} from 'react';
+import React from "react";
 import RatesTable from "./components/RatesTable";
 
-class App extends Component {
+export default function () {
+  return (
+    <div className="container">
+      <div className="row">
+        <div className="col-md-2"></div>
 
-    render() {
-        return (
-            <div className="container">
-                <div className="row">
-                    <div className="col-md-3"></div>
+        <div className="col-md-8">
+          <RatesTable />
+        </div>
 
-                    <div className="col-md-6">
-                        <RatesTable />
-                    </div>
-                    
-                    <div className="col-md-3"></div>
-                </div>
-            </div>
-        )
-    }
+        <div className="col-md-2"></div>
+      </div>
+    </div>
+  );
 }
-
-export default App;
