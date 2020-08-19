@@ -37,7 +37,7 @@ class RatesTable extends Component {
         <div className="card-body">
           <h5 className="card-title">Exchange Rates</h5>
 
-          <table className="table table-sm">
+          <table className="table table-sm table-hover">
             <thead>
               <tr>
                 <th scope="col">Ticker</th>
