@@ -1,4 +1,3 @@
 ﻿export default {
-    useExampleRates: true,
-    ratesUrl: ""
-}
+  useExampleRates: true
+};

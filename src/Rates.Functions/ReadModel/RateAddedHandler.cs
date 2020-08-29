@@ -33,13 +33,14 @@ namespace Rates.Functions.ReadModel
 
             var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateDefinitionsJson);
             var definition = rateDefinitions.Single(l => l.Ticker == rate.Ticker);
+            var index = rateDefinitions.IndexOf(definition);
 
-            var readModelEntity = await GetReadModelEntity(rate, definition);
+            var readModelEntity = await GetReadModelEntity(rate, definition, index);
 
             await SaveEntity(readModelTable, readModelEntity);
         }
 
-        private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition)
+        private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition, int order)
         {
             var timeAdded = DateTimeOffset.Parse(rate.TimeKey);
 
@@ -57,6 +58,7 @@ namespace Rates.Functions.ReadModel
                 name: rateDefinition.Name,
                 href: rateDefinition.Href,
                 value: rate.Value,
+                order: order,
                 change1Day: oneDayChange,
                 change1Week: oneWeekChange,
                 change1Month: oneMonthChange,
