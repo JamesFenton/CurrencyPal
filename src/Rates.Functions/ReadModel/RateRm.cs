@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace Rates.Functions.ReadModel
 {
-    public class RateRm
+    public class RateRm : TableEntity
     {
-        public string PartitionKey { get; set; } = "readmodel";
-        public string RowKey { get; set; }
-
         public string Ticker { get; set; }
         public string Name { get; set; }
         public string Href { get; set; }
@@ -40,6 +37,7 @@ namespace Rates.Functions.ReadModel
             double? change1Year
         )
         {
+            PartitionKey = "readmodel";
             RowKey = ticker;
             Ticker = ticker;
             Name = name;

@@ -22,15 +22,18 @@ namespace Rates.Functions.ReadModel
         }
 
         [FunctionName("RateAddedHandler")]
-        [return: Table(Database.RatesRmTable)]
-        public async Task<RateRm> Run(
+        public async Task Run(
             [QueueTrigger(Constants.RatesAddedQueue)] RateEntity rate,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
+            [Table(Database.RatesRmTable)] CloudTable table
         )
         {
             var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateDefinitionsJson);
             var definition = rateDefinitions.Single(l => l.Ticker == rate.Ticker);
-            return await GetReadModelEntity(rate, definition);
+
+            var readModelEntity = await GetReadModelEntity(rate, definition);
+
+            await SaveEntity(table, readModelEntity);
         }
 
         private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition)
@@ -76,6 +79,12 @@ namespace Rates.Functions.ReadModel
                 return null;
             var percentageChange = (rateNow - rateThen) / rateThen * 100;
             return percentageChange.HasValue ? Math.Round(percentageChange.Value, 2) : (double?)null;
+        }
+
+        private async Task SaveEntity(CloudTable table, RateRm entity)
+        {
+            var operation = TableOperation.InsertOrReplace(entity);
+            await table.ExecuteAsync(operation);
         }
     }
 }
