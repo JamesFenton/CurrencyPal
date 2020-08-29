@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace Rates.Functions.WriteModel
 {
@@ -39,43 +40,45 @@ namespace Rates.Functions.WriteModel
         [FunctionName("FetchFromCoinMarketCap")]
         public async Task FetchFromCoinMarketCap(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
             [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
         }
 
         [FunctionName("FetchFromIex")]
         public async Task FetchFromIex(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
             [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
         }
 
         [FunctionName("FetchFromOpenExchangeRates")]
         public async Task FetchFromOpenExchangeRates(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
             [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
         }
 
         private async Task GetRatesAsync(
             RateSource rateSource,
-            List<Rate> rateDefinitions,
+            string rateDefinitionsJson,
             CloudTable table,
             ICollector<RateEntity> queueCollector
         )
         {
+            var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateDefinitionsJson);
+
             if (!_ratesServices.TryGetValue(rateSource, out var service))
                 throw new ArgumentException($"No service available for rate source {rateSource}");
 
