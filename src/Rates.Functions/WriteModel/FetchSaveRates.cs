@@ -52,7 +52,7 @@ namespace Rates.Functions.WriteModel
             ILogger logger
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector, logger);
+            await GetRatesAsync(RateSource.Iex, rateDefinitionsJson, table, queueCollector, logger);
         }
 
         [FunctionName("FetchFromOpenExchangeRates")]
@@ -64,7 +64,7 @@ namespace Rates.Functions.WriteModel
             ILogger logger
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector, logger);
+            await GetRatesAsync(RateSource.OpenExchangeRates, rateDefinitionsJson, table, queueCollector, logger);
         }
 
         private async Task GetRatesAsync(
