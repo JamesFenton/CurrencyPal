@@ -39,7 +39,7 @@ namespace Rates.Functions.WriteModel
         public async Task FetchFromCoinMarketCap(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
-            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
@@ -50,7 +50,7 @@ namespace Rates.Functions.WriteModel
         public async Task FetchFromIex(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
-            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
@@ -61,7 +61,7 @@ namespace Rates.Functions.WriteModel
         public async Task FetchFromOpenExchangeRates(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
-            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
