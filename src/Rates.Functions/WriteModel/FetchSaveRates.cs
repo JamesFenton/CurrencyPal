@@ -16,43 +16,71 @@ namespace Rates.Functions.WriteModel
     public class FetchSaveRates
     {
         private readonly Database _database;
-        private readonly IEnumerable<IRatesService> _ratesServices;
+        private readonly Dictionary<RateSource, IRatesService> _ratesServices;
+        private readonly ILogger _logger;
 
         public FetchSaveRates(
             Database database,
             CoinMarketCapService coinMarketCapService,
             IexService iexService,
-            OpenExchangeRatesService openExchangeRatesService
+            OpenExchangeRatesService openExchangeRatesService,
+            ILogger logger
         )
         {
             _database = database;
-            _ratesServices = new IRatesService[] 
+            _ratesServices = new Dictionary<RateSource, IRatesService>
             {
-                coinMarketCapService,
-                iexService,
-                openExchangeRatesService
+                [RateSource.CoinMarketCap] = coinMarketCapService,
+                [RateSource.Iex] = iexService,
+                [RateSource.OpenExchangeRates] = openExchangeRatesService
             };
+            _logger = logger;
         }
 
-        [FunctionName("FetchSaveRates")]
-        public async Task Run(
-            [TimerTrigger("0 0 * * * *")]TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
-            [Queue(Constants.RatesAddedQueue)] ICollector<string> destinationQueue,
-            ILogger log)
+        [FunctionName("FetchFromCoinMarketCap")]
+        [return: Queue(Constants.RatesAddedQueue)]
+        public async Task<string> FetchFromCoinMarketCap(
+            [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+        )
         {
-            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
+            return await GetRatesAsync(RateSource.CoinMarketCap, rateLookupsJson);
+        }
 
-            // get rates
-            log.LogInformation($"Getting {rateLookups.Count()} rates from {_ratesServices.Count()} services");
-            var rates = (await Task.WhenAll(
-                _ratesServices.Select(s => s.GetRates(rateLookups))
-            ))
-            .SelectMany(r => r)
-            .ToList();
+        [FunctionName("FetchFromIex")]
+        [return: Queue(Constants.RatesAddedQueue)]
+        public async Task<string> FetchFromIex(
+            [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+        )
+        {
+            return await GetRatesAsync(RateSource.Iex, rateLookupsJson);
+        }
+
+        [FunctionName("FetchFromOpenExchangeRates")]
+        [return: Queue(Constants.RatesAddedQueue)]
+        public async Task<string> FetchFromOpenExchangeRates(
+            [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+        )
+        {
+            return await GetRatesAsync(RateSource.OpenExchangeRates, rateLookupsJson);
+        }
+
+        private async Task<string> GetRatesAsync(RateSource rateSource, string rateLookupsJson)
+        {
+            if (!_ratesServices.TryGetValue(rateSource, out var service))
+                throw new ArgumentException($"No service available for rate source {rateSource}");
+
+            // chose rates for this source
+            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
+                .Where(r => r.Source == rateSource);
+
+            // fetch rates
+            var rates = await service.GetRates(rateLookups);
 
             // save to storage
-            log.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
+            _logger.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
             await Task.WhenAll(rates.Select(rate =>
             {
                 var operation = TableOperation.InsertOrReplace(rate);
@@ -60,9 +88,8 @@ namespace Rates.Functions.WriteModel
             }));
 
             // send queue message
-            log.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
-            var message = JsonConvert.SerializeObject(rates);
-            destinationQueue.Add(message);
+            _logger.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
+            return JsonConvert.SerializeObject(rates);
         }
     }
 }
