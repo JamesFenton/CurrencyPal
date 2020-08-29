@@ -26,8 +26,10 @@ steps:
     displayName: 'Azure Function App Deploy: ratesfenton'
     inputs:
       azureSubscription: 'Visual Studio Professional with MSDN (fbcfa0cd-2f10-4cda-9539-f4ad99c3d654)'
-      appType: functionApp
-      appName: ratesfenton
+      appType: 'functionApp'
+      appName: 'ratesfenton'
+      package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+      deploymentMethod: 'auto'
 
   - task: PublishBuildArtifacts@1
     inputs:
