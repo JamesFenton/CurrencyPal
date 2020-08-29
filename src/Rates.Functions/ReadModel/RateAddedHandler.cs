@@ -25,15 +25,18 @@ namespace Rates.Functions.ReadModel
         public async Task Run(
             [QueueTrigger(Constants.RatesAddedQueue)] RateEntity rate,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesRmTable)] CloudTable table
+            [Table(Database.RatesRmTable)] CloudTable readModelTable,
+            ILogger logger
         )
         {
+            logger.LogInformation($"Handling rate {rate.Ticker}");
+
             var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateDefinitionsJson);
             var definition = rateDefinitions.Single(l => l.Ticker == rate.Ticker);
 
             var readModelEntity = await GetReadModelEntity(rate, definition);
 
-            await SaveEntity(table, readModelEntity);
+            await SaveEntity(readModelTable, readModelEntity);
         }
 
         private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition)

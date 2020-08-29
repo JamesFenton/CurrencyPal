@@ -1,7 +1,5 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Polly;
 using Rates.Functions.Services;
 using System;
@@ -20,13 +18,7 @@ namespace Rates.Functions
             var services = builder.Services;
             
             services.AddSingleton(c => new Database(Environment.GetEnvironmentVariable("AzureWebJobsStorage")));
-
-            services.AddSingleton(new JsonSerializer
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                Formatting = Formatting.Indented,
-            });
-
+            
             // external services
             var retryTimeouts = new[]
             {
