@@ -9,6 +9,9 @@ namespace Rates.Functions
 {
     public class Database
     {
+        public const string RatesTable = "rates";
+        public const string RatesRmTable = "ratesrm";
+
         private readonly CloudTableClient _client;
 
         public CloudTable Rates { get; }
@@ -20,8 +23,8 @@ namespace Rates.Functions
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             _client = storageAccount.CreateCloudTableClient();
 
-            Rates = _client.GetTableReference("rates");
-            RatesRm = _client.GetTableReference("ratesrm");
+            Rates = _client.GetTableReference(RatesTable);
+            RatesRm = _client.GetTableReference(RatesRmTable);
         }
     }
 }

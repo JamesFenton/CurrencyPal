@@ -9,6 +9,9 @@ namespace Rates.Functions.ReadModel
 {
     public class RateRm
     {
+        public string PartitionKey { get; set; } = "readmodel";
+        public string RowKey { get; set; }
+
         public string Ticker { get; set; }
         public string Name { get; set; }
         public string Href { get; set; }
@@ -37,6 +40,7 @@ namespace Rates.Functions.ReadModel
             double? change1Year
         )
         {
+            RowKey = ticker;
             Ticker = ticker;
             Name = name;
             Href = href;

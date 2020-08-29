@@ -7,9 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.IO;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Rates.Functions.WriteModel
 {
@@ -38,58 +36,61 @@ namespace Rates.Functions.WriteModel
         }
 
         [FunctionName("FetchFromCoinMarketCap")]
-        [return: Queue(Constants.RatesAddedQueue)]
-        public async Task<string> FetchFromCoinMarketCap(
+        public async Task FetchFromCoinMarketCap(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            return await GetRatesAsync(RateSource.CoinMarketCap, rateLookupsJson);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, tableCollector, queueCollector);
         }
 
         [FunctionName("FetchFromIex")]
-        [return: Queue(Constants.RatesAddedQueue)]
-        public async Task<string> FetchFromIex(
+        public async Task FetchFromIex(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            return await GetRatesAsync(RateSource.Iex, rateLookupsJson);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, tableCollector, queueCollector);
         }
 
         [FunctionName("FetchFromOpenExchangeRates")]
-        [return: Queue(Constants.RatesAddedQueue)]
-        public async Task<string> FetchFromOpenExchangeRates(
+        public async Task FetchFromOpenExchangeRates(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson
+            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions,
+            [Table(Database.RatesRmTable)] ICollector<RateEntity> tableCollector,
+            [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            return await GetRatesAsync(RateSource.OpenExchangeRates, rateLookupsJson);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitions, tableCollector, queueCollector);
         }
 
-        private async Task<string> GetRatesAsync(RateSource rateSource, string rateLookupsJson)
+        private async Task GetRatesAsync(
+            RateSource rateSource,
+            List<Rate> rateDefinitions,
+            ICollector<RateEntity> tableCollector,
+            ICollector<RateEntity> queueCollector
+        )
         {
             if (!_ratesServices.TryGetValue(rateSource, out var service))
                 throw new ArgumentException($"No service available for rate source {rateSource}");
 
             // chose rates for this source
-            var rateLookups = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson)
-                .Where(r => r.Source == rateSource);
+            var rateLookups = rateDefinitions.Where(r => r.Source == rateSource);
 
             // fetch rates
             var rates = await service.GetRates(rateLookups);
 
-            // save to storage
+            // save to table storage & send queue message
             _logger.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
-            await Task.WhenAll(rates.Select(rate =>
+            foreach (var rate in rates)
             {
-                var operation = TableOperation.InsertOrReplace(rate);
-                return _database.Rates.ExecuteAsync(operation);
-            }));
-
-            // send queue message
-            _logger.LogInformation($"Sending {rates.Count()} rates to {Constants.RatesAddedQueue} queue");
-            return JsonConvert.SerializeObject(rates);
+                tableCollector.Add(rate);
+                queueCollector.Add(rate);
+            }
         }
     }
 }

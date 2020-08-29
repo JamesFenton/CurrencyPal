@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Rates.Functions.WriteModel;
 using System.Linq;
 using System.IO;
@@ -15,50 +14,22 @@ namespace Rates.Functions.ReadModel
     public class RateAddedHandler
     {
         private readonly Database _database;
-        private readonly JsonSerializer _jsonSerializer;
 
-        public RateAddedHandler(Database database, JsonSerializer jsonSerializer)
+        public RateAddedHandler(Database database)
         {
             _database = database;
-            _jsonSerializer = jsonSerializer;
         }
 
         [FunctionName("RateAddedHandler")]
-        public async Task Run(
-            [QueueTrigger(Constants.RatesAddedQueue)] string myQueueItem,
-            [Blob("lookups/rates.json", FileAccess.Read)] string rateLookupsJson,
-            [Blob("read-model/rates.json", FileAccess.Write)] TextWriter ratesBlob,
-            ILogger log)
+        [return: Table(Database.RatesRmTable)]
+        public async Task<RateRm> Run(
+            [QueueTrigger(Constants.RatesAddedQueue)] RateEntity rate,
+            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions
+        )
         {
-            var rates = JsonConvert.DeserializeObject<List<RateEntity>>(myQueueItem);
-            var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateLookupsJson);
 
-            log.LogInformation($"Handling {rates.Count} new rates");
-
-            // create read model entities
-            var readModelEntities = await Task.WhenAll(
-                rates.Select(r => (rate: r, definition: rateDefinitions.Single(l => l.Ticker == r.Ticker)))
-                     .Select(x => GetReadModelEntity(x.rate, x.definition))
-            );
-
-            log.LogInformation("Created read model entities");
-
-            // order and create DTO
-            var orderedRates = rateDefinitions
-                .Select(rate => readModelEntities.FirstOrDefault(r => r.Ticker == rate.Ticker))
-                .Where(r => r != null)
-                .ToList();
-
-            var updateTime = orderedRates.Max(r => r.Timestamp).ToUnixTimeMilliseconds();
-
-            var dto = new GetRatesDto
-            {
-                Rates = orderedRates,
-                UpdateTime = updateTime,
-            };
-
-            // save dto to storage
-            _jsonSerializer.Serialize(ratesBlob, dto);
+            var definition = rateDefinitions.Single(l => l.Ticker == rate.Ticker);
+            return await GetReadModelEntity(rate, definition);
         }
 
         private async Task<RateRm> GetReadModelEntity(RateEntity rate, Rate rateDefinition)
