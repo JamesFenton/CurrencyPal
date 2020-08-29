@@ -13,6 +13,7 @@ namespace Rates.Functions.ReadModel
         public string Name { get; set; }
         public string Href { get; set; }
         public double Value { get; set; }
+        public int Order { get; set; }
         public DateTimeOffset Timestamp { get; set; }
 
         public double? Change1Day { get; set; }
@@ -29,6 +30,7 @@ namespace Rates.Functions.ReadModel
             string name,
             string href,
             double value,
+            int order,
             double? change1Day,
             double? change1Week,
             double? change1Month,
@@ -43,6 +45,7 @@ namespace Rates.Functions.ReadModel
             Name = name;
             Href = href;
             Value = value;
+            Order = order;
             Timestamp = DateTimeOffset.UtcNow;
             Change1Day = change1Day;
             Change1Week = change1Week;
