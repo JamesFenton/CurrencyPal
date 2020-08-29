@@ -18,7 +18,7 @@ export default function (req: NowRequest, res: NowResponse) {
 
     const dtos = _(result.entries)
       .map(convertTableEntityToDto)
-      .orderBy((x) => x["order"], "desc")
+      .orderBy((x) => x["order"])
       .value();
 
     console.log(`Received ${dtos.length} values`);
