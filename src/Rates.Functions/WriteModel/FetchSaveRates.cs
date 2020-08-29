@@ -41,39 +41,39 @@ namespace Rates.Functions.WriteModel
         public async Task FetchFromCoinMarketCap(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, tableCollector, queueCollector);
         }
 
         [FunctionName("FetchFromIex")]
         public async Task FetchFromIex(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, tableCollector, queueCollector);
         }
 
         [FunctionName("FetchFromOpenExchangeRates")]
         public async Task FetchFromOpenExchangeRates(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
+            [Table(Database.RatesTable)] ICollector<RateEntity> tableCollector,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, tableCollector, queueCollector);
         }
 
         private async Task GetRatesAsync(
             RateSource rateSource,
             string rateDefinitionsJson,
-            CloudTable table,
+            ICollector<RateEntity> tableCollector,
             ICollector<RateEntity> queueCollector
         )
         {
@@ -90,14 +90,11 @@ namespace Rates.Functions.WriteModel
 
             // save to table storage & send queue message
             _logger.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
-            await Task.WhenAll(rates.Select(rate =>
-            {
-                var operation = TableOperation.InsertOrReplace(rate);
-                return _database.Rates.ExecuteAsync(operation);
-            }));
-
             foreach (var rate in rates)
+            {
+                tableCollector.Add(rate);
                 queueCollector.Add(rate);
+            }
         }
     }
 }

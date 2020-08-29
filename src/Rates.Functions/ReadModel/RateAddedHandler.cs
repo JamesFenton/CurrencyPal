@@ -8,6 +8,7 @@ using Rates.Functions.WriteModel;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Rates.Functions.ReadModel
 {
@@ -24,10 +25,10 @@ namespace Rates.Functions.ReadModel
         [return: Table(Database.RatesRmTable)]
         public async Task<RateRm> Run(
             [QueueTrigger(Constants.RatesAddedQueue)] RateEntity rate,
-            [Blob("lookups/rates.json", FileAccess.Read)] List<Rate> rateDefinitions
+            [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson
         )
         {
-
+            var rateDefinitions = JsonConvert.DeserializeObject<List<Rate>>(rateDefinitionsJson);
             var definition = rateDefinitions.Single(l => l.Ticker == rate.Ticker);
             return await GetReadModelEntity(rate, definition);
         }
