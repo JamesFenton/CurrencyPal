@@ -17,14 +17,14 @@ namespace Rates.Functions.WriteModel
     {
         private readonly Database _database;
         private readonly Dictionary<RateSource, IRatesService> _ratesServices;
-        private readonly ILogger _logger;
+        private readonly ILogger<FetchSaveRates> _logger;
 
         public FetchSaveRates(
             Database database,
             CoinMarketCapService coinMarketCapService,
             IexService iexService,
             OpenExchangeRatesService openExchangeRatesService,
-            ILogger logger
+            ILogger<FetchSaveRates> logger
         )
         {
             _database = database;
