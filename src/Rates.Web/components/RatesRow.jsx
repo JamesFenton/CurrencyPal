@@ -5,7 +5,8 @@ export default function ({ rate }) {
   const round = (value) => {
     if (!value) return "";
     if (value < 1) return value.toFixed(4);
-    return value.toFixed(2);
+    if (value < 100) return value.toFixed(2);
+    return value.toFixed(0);
   };
 
   const isOutOfDate = (timestamp) => {
