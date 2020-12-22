@@ -25,7 +25,7 @@ steps:
   - task: AzureFunctionApp@1
     displayName: 'Azure Function App Deploy: ratesfenton'
     inputs:
-      azureSubscription: 'Visual Studio Professional with MSDN (fbcfa0cd-2f10-4cda-9539-f4ad99c3d654)'
+      azureSubscription: 'Pay-As-You-Go(42df69a9-0c66-4d1b-ac12-36367bd20375)'
       appType: 'functionApp'
       appName: 'ratesfenton'
       package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
