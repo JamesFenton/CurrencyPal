@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System.IO;
-using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using Rates.Functions.Models;
 
-namespace Rates.Functions.WriteModel
+namespace Rates.Functions.Functions
 {
     public class FetchSaveRates
     {
@@ -35,42 +35,38 @@ namespace Rates.Functions.WriteModel
         public async Task FetchFromCoinMarketCap(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector,
             ILogger logger
         )
         {
-            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, table, queueCollector, logger);
+            await GetRatesAsync(RateSource.CoinMarketCap, rateDefinitionsJson, queueCollector, logger);
         }
 
         [FunctionName("FetchFromIex")]
         public async Task FetchFromIex(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector,
             ILogger logger
         )
         {
-            await GetRatesAsync(RateSource.Iex, rateDefinitionsJson, table, queueCollector, logger);
+            await GetRatesAsync(RateSource.Iex, rateDefinitionsJson, queueCollector, logger);
         }
 
         [FunctionName("FetchFromOpenExchangeRates")]
         public async Task FetchFromOpenExchangeRates(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             [Blob("lookups/rates.json", FileAccess.Read)] string rateDefinitionsJson,
-            [Table(Database.RatesTable)] CloudTable table,
             [Queue(Constants.RatesAddedQueue)] ICollector<RateEntity> queueCollector,
             ILogger logger
         )
         {
-            await GetRatesAsync(RateSource.OpenExchangeRates, rateDefinitionsJson, table, queueCollector, logger);
+            await GetRatesAsync(RateSource.OpenExchangeRates, rateDefinitionsJson, queueCollector, logger);
         }
 
         private async Task GetRatesAsync(
             RateSource rateSource,
             string rateDefinitionsJson,
-            CloudTable table,
             ICollector<RateEntity> queueCollector,
             ILogger logger
         )
@@ -90,9 +86,11 @@ namespace Rates.Functions.WriteModel
             logger.LogInformation($"Got {rates.Count()} rates. Saving to storage.");
             foreach (var rate in rates)
             {
-                var operation = TableOperation.InsertOrReplace(rate);
-                await table.ExecuteAsync(operation);
+                await rate.SaveAsync();
                 queueCollector.Add(rate);
+
+                var rateHistory = new RateHistory(rate.Ticker, rate.Value);
+                await rateHistory.SaveAsync();
             }
         }
     }

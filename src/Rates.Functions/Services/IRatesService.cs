@@ -1,4 +1,4 @@
-﻿using Rates.Functions.WriteModel;
+﻿using Rates.Functions.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

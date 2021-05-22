@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rates.Functions.ReadModel
+namespace Rates.Functions.Models
 {
-    public class RateRm : TableEntity
+    public class RateRm : Entity
     {
         public string Ticker { get; set; }
         public string Name { get; set; }

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using Rates.Functions.WriteModel;
+using Rates.Functions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

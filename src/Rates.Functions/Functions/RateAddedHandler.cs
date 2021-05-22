@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Rates.Functions.WriteModel;
+using Rates.Functions.Models;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
