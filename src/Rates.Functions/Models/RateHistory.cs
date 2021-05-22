@@ -17,7 +17,7 @@ namespace Rates.Functions.Models
         public RateHistory(string ticker, double value)
         {
             PartitionKey = ticker;
-            RowKey = DateTimeOffset.UtcNow.GetNearestHour().ToString("yyyy-MM-dd");
+            RowKey = DateTimeOffset.UtcNow.GetNearestHour().AddHours(-1).ToString("yyyy-MM-dd"); // 2021-05-22 00:01 -> 2021-05-21
             Value = value;
         }
     }
